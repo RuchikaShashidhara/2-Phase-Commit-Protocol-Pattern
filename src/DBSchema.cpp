@@ -1,5 +1,5 @@
-#include "header/File.h"
-#include "header/DBSchema.h"
+#include "../include/File.h"
+#include "../include/DBSchema.h"
 
 #include <iostream>
 #include <algorithm>
