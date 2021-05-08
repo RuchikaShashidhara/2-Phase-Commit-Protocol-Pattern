@@ -1,8 +1,8 @@
-#include "../include/File.h"
-#include "../include/DBSchema.h"
-
 #include <iostream>
 #include <algorithm>
+
+#include "../include/File.h"
+#include "../include/DBSchema.h"
 
 using namespace std;
 
@@ -10,25 +10,25 @@ using namespace std;
 */
 DBSchema :: DBSchema(File* file_values_obj_ptr, vector<string>& schema) 
 {
-    file_values_ptr = file_values_obj_ptr;
-    file_values_ptr -> addRecord(schema);
-    db_schema.assign(schema.begin(), schema.end());
+    __file_values_ptr = file_values_obj_ptr;
+    int row1 = __file_values_ptr -> addRecord(schema);
+    __db_schema.assign(schema.begin(), schema.end());
 }
 
 /*
 */
 DBSchema :: ~DBSchema() 
 {
-
+    __file_values_ptr = NULL;
 }
 
 /*
 */
-int DBSchema :: getRowNum(string id)
+int DBSchema :: __getRowNum(string id)
 {
     int row_num;
-    auto id_row_num_itr = id_row_num.find(id);
-    if (id_row_num_itr != id_row_num.end()) 
+    map<string, int>::iterator id_row_num_itr = __id_row_num.find(id);
+    if (id_row_num_itr != __id_row_num.end()) 
     {
         row_num = id_row_num_itr -> second;
     }
@@ -41,70 +41,77 @@ int DBSchema :: getRowNum(string id)
 
 /*
 */
-int DBSchema :: getColNum(string schema_col_name) 
+int DBSchema :: __getColNum(string schema_col_name) 
 {
     int col_num;
-    auto schema_itr = find(db_schema.begin(), db_schema.end(), schema_col_name);
-    if (schema_itr != db_schema.end()) 
+    vector<string>::iterator schema_itr = find(__db_schema.begin(), __db_schema.end(), schema_col_name);
+    if (schema_itr != __db_schema.end()) 
     {
-        col_num = schema_itr - db_schema.begin();
+        col_num = schema_itr - __db_schema.begin();
     }
     else 
     {
         col_num = -1;
     }
 
-    
     return col_num;
 }
 
 /*
 */
-void DBSchema :: addRecord(vector<string>& record_values) 
+pair<bool, int> DBSchema :: getRowNumRecord(string id)
 {
-    file_values_ptr -> addRecord(record_values);
-}
-
-/*
-*/
-void DBSchema :: updateRecord(string id, vector<string>& record_values) 
-{
-    int row_num = getRowNum(id);
-    int total_col = file_values_ptr -> getTotalColNum();
-    for (int ci = 0; ci < total_col; ci++)
+    pair<bool, int> result_success_row_num;
+    int row_num = __getRowNum(id);
+    
+    if (row_num == -1)      // invalid
     {
-        file_values_ptr -> updateCellValue(row_num, ci, record_values[ci]);
+        result_success_row_num.first = false;
+        result_success_row_num.second = -1;
+    }
+    else    // valid
+    {
+        result_success_row_num.first = true;
+        result_success_row_num.second = row_num;
     }
 
+    return result_success_row_num;
 }
 
 /*
 */
-void DBSchema :: updateRecordCell(string id, string schema_col_name, string value) 
+pair<bool, pair<int, int>> DBSchema :: getRowColNumsCell(string id, string schema_col_name) 
 {
-    int row_num = getRowNum(id);
-    int col_num = getColNum(schema_col_name);
-    file_values_ptr -> updateCellValue(row_num, col_num, value);
-}
-
-/*
-*/
-void DBSchema :: deleteRecord(string id) 
-{
-    int row_num = getRowNum(id);
-    file_values_ptr -> removeRecord(row_num);
-}
-
-/*
-*/
-vector<string> DBSchema :: readRecord(string id) 
-{
-    int row_num = getRowNum(id);
-    int total_col = file_values_ptr -> getTotalColNum();
-    vector<string> record_values(total_col);
-    for (int ci = 0; ci < total_col; ci++) 
+    pair<bool, pair<int, int>> result_success_row_col_nums;
+    int row_num = __getRowNum(id);
+    int col_num = __getColNum(schema_col_name);
+    
+    if (row_num == -1 || col_num == -1)     // invalid
     {
-        record_values[ci] = file_values_ptr -> readCellValue(row_num, ci);
+        result_success_row_col_nums.first = false;
+        result_success_row_col_nums.second.first = -1;
+        result_success_row_col_nums.second.second = -1;
     }
-    return record_values;
+    else    // valid
+    {
+        result_success_row_col_nums.first = true;
+        result_success_row_col_nums.second.first = row_num;
+        result_success_row_col_nums.second.second = col_num;
+    }
+
+    return result_success_row_col_nums;
+}
+
+/*
+*/
+void DBSchema :: updateIdRowNum(int row_num, string id, int op_code)
+{
+        if (op_code == 0)               // addRecord
+        {
+            __id_row_num[id] = row_num;
+        }
+        else if (op_code == 1)          // deleteRecord
+        {
+            __id_row_num.erase(id);
+        }
 }

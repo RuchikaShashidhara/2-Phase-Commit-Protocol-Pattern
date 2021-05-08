@@ -3,6 +3,8 @@
 
 #include <string>
 #include <vector>
+#include <semaphore.h>
+#include <time.h>
 
 using namespace std;
 
@@ -11,23 +13,25 @@ using namespace std;
 class File 
 {
     private:
-        vector<vector<string>> file_values;
-        int file_total_num_of_row;
-        int file_total_num_of_col;        
-        int semaphore;
+        vector<vector<string>> __file_values;
+        int __file_total_num_of_row;
+        int __file_total_num_of_col;        
+        sem_t __semaphore_lock;
+        struct timespec __time_spec;
 
     public:
         File(int num_of_row, int num_of_col);
         ~File();
         int getTotalRowNum();
         int getTotalColNum();
-        int getSemaphore();
-        void setSemaphore(int semaphore_value);
-        string readCellValue(int row, int col);
-        void updateCellValue(int row, int col, string value);
-        void addRecord(vector<string>& record_values);
-        void removeRecord(int row);
-
+        bool aquire_lock();
+        void release_lock();
+        int addRecord(vector<string> record_values);                //op_code = 0
+        void deleteRecord(int row);                                 //op_code = 1
+        vector<string> readRecord(int row);                         //op_code = 2
+        string readCell(int row, int col);                          //op_code = 20
+        void updateRecord(int row, vector<string> record_values);   //op_code = 3
+        void updateCell(int row, int col, string value);            //op_code = 30 
 };
 
 #endif

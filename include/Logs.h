@@ -7,15 +7,17 @@ using namespace std;
 
 struct Log
 {
-	int opCode;
-		// 0 - add record
-		// 1 - update record
-		// 2 - delete record
-		// 3 - read record
+	int op_code;
+		// 0  - add record
+		// 1  - delete record
+		// 2  - read record
+		// 20 - read cell
+		// 3  - update record
+		// 30 - update cell
 	int row;
 	int col;
-	string oldValue;
-	string newValue;
+	string old_value;
+	string new_value;
 };
 
 typedef struct Log Log_t;
