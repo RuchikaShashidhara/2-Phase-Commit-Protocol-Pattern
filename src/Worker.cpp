@@ -4,11 +4,11 @@ using namespace std;
 
 #include <vector>
 
-Worker::Worker(File& fp) : fp(fp) {}
+Worker::Worker(File *fp) : fp(fp) {}
 
 int Worker::prepare()
 {
-	if(fp.acquire_lock() == true)
+	if(fp.acquire_lock(2, 0) == true)
 		return 1;
 	return 0;
 }

@@ -10,6 +10,7 @@ struct Log
 	int record_op;
 		// 1 = true
 		// 0 = false => cell operation
+		
 	int read_op;
 		//1 = true
 		//0 = false => write(update) operation

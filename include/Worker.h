@@ -14,7 +14,7 @@ class Worker : public Node
 		vector <Log_t *> logs;
 		
 	public:
-		Worker(File& fp);
+		Worker(File *fp);
 		int prepare();
 		int releaseLock();
 		int commit(void* operation);
