@@ -1,11 +1,12 @@
 #include <iostream>
-#include <format>
+#include <cstdio>
 
+using namespace std;
+
+#include "../include/Amazon.h"
 #include "../include/Mediator.h"
 #include "../include/Coordinator.h"
 #include "../include/Worker.h"
-
-using namespace std;
 
 Amazon::Amazon(string branch_name) : branch_name(branch_name) 
 {
@@ -38,26 +39,28 @@ Amazon::Amazon(string branch_name) : branch_name(branch_name)
     };
     this->shipping_db_schema = new DBSchema(shipping_db, shipping_col_names);
     
-    IMessageQueue *mq = new IMessageQueue("Message system");
+    IMessageQueue *mq = new MessageQueue("Message system");
     Worker *w1 = new Worker(this->customer_db);
     Worker *w2 = new Worker(this->payment_db);
     Worker *w3 = new Worker(this->shipping_db);
-    this->coord = new Coordinator(3, vector <Worker *> (w1, w2, w3), mq);    
+    this->coord = new Coordinator(3, {w1, w2, w3}, mq);    
     
-    this->coord.join(mq);
-    w1.join(mq);
-    w2.join(mq);
-    w3.join(mq);
+    this->coord->join(mq);
+    w1->join(mq);
+    w2->join(mq);
+    w3->join(mq);
     
     userCount = 0;
     paymentCount = 0;
     shippingCount = 0;
 }
 
-string Amazon::registerUser()
+int Amazon::registerUser()
 {
+	char id[20];
 	++userCount; 
-  	string uid = std::format("c{}", userCount);  	
+  	sprintf(id, "c%d", userCount);  
+  	string uid(id);	
   	string name, ph, addr;
   	
   	cout << "Enter user's name: ";
@@ -69,10 +72,10 @@ string Amazon::registerUser()
   	cout << "Enter user's address: ";
   	cin >> addr;
   	
-	vector <string> new_record (uid, name, ph, addr);
+	vector <string> new_record = {uid, name, ph, addr};
     Log_t op = {1, 2, -1, -1, new_record};
     
-    vector <Log_t *> opList (&op, NULL, NULL);
+    vector <Log_t *> opList = {&op, NULL, NULL};
     int result = coord->performTransaction(opList);
     
     if(result == 1)
@@ -103,7 +106,7 @@ vector <string> Amazon::getUserDetails(string id)
     return record_values;
 }	
 
-vector <string> Amazon::getUserTransactions(string id)
+vector <string> Amazon::getTransactionDetails(string id)
 {
     vector<string> record_values;
     pair<bool, int> success_row_num = payment_db_schema->getRowNumRecord(id);
@@ -148,15 +151,15 @@ int Amazon::updateUserDetails()
 	cout << "Enter the new value: ";
 	cin >> value;	
 	
-    pair<bool, pair<int, int>> success_row_num = db_schema_obj->getRowColNumsCell(uid, schema_col_name);
+    pair<bool, pair<int, int>> success_row_num = customer_db_schema->getRowColNumsCell(uid, schema_col_name);
     
     if (success_row_num.first)
     {
-    	vector <string> new_record (id, "", "", "");
+    	vector <string> new_record = {uid, "", "", ""};
     	new_record[success_row_num.second.second] = value;
         Log_t op = {0, 0, success_row_num.second.first, success_row_num.second.second, new_record};
         
-        vector <Log_t *> opList (&op, NULL, NULL);
+        vector <Log_t *> opList = {&op, NULL, NULL};
         int result = coord->performTransaction(opList);
         
         if(result == 1)
@@ -180,11 +183,15 @@ int Amazon::updateUserDetails()
 
 int Amazon::makePayment()
 {
-	++paymentCount;
-  	string pid = format("c{}", paymentCount); 
+	char id[20];
+	
+	++paymentCount; 	
+  	sprintf(id, "c%d", paymentCount); 
+  	string pid(id);; 
   	
 	++shippingCount;
-  	string sid = format("c{}", shippingCount); 
+  	sprintf(id, "c%d", shippingCount);  
+  	string sid(id);
   	
   	string uid, amount, mode, location, delivered, timestamp;
   	
@@ -200,16 +207,16 @@ int Amazon::makePayment()
   	cout << "Enter delivery location: ";
   	cin >> location;
   	
-  	delivery = "false";
+  	delivered = "false";
   	timestamp = "now";
   	
-  	vector <string> paymentRecord (pid, uid, amount, mode, timestamp);
-  	vector <string> shippingRecord (sid, pid, location, delivered, timestamp);  	
+  	vector <string> paymentRecord = {pid, uid, amount, mode, timestamp};
+  	vector <string> shippingRecord = {sid, pid, location, delivered, timestamp};  	
   	
     Log_t payment_op = {1, 2, -1, -1, paymentRecord};
     Log_t shipping_op = {1, 2, -1, -1, shippingRecord};
     
-    vector <Log_t *> opList (NULL, &payment_op, &shipping_op);  	
+    vector <Log_t *> opList = {NULL, &payment_op, &shipping_op};  	
     int result = coord->performTransaction(opList);
     
     if(result == 1)

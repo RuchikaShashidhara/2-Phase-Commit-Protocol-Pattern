@@ -33,12 +33,12 @@ class Amazon
 	
 	public:
 		Amazon(string branch_name);
-		string registerUser(string name, int phno, string address);
+		int registerUser();
 		vector <string> getUserDetails(string id);
 		vector <string> getTransactionDetails(string id);
 		
 		int updateUserDetails();
-		int makeTransaction();			
+		int makePayment();			
 };
 
 #endif

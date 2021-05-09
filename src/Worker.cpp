@@ -4,7 +4,7 @@
 
 using namespace std;
 
-Worker::Worker(DBFile *fp) : fp(*fp) {}
+Worker::Worker(File *fp) : fp(*fp) {}
 
 int Worker::prepare()
 {

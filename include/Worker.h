@@ -10,11 +10,11 @@
 class Worker : public Node
 {
 	private:
-		DBFile& fp;
+		File *fp;
 		vector <Log_t *> logs;
 		
 	public:
-		Worker(DBFile *fp);
+		Worker(File *fp);
 		int prepare();
 		int releaseLock();
 		int commit(void* operation);
