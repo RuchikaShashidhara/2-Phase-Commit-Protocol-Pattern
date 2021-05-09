@@ -1,11 +1,11 @@
+#include <iostream>
 #include <vector>
 #include <semaphore.h>
 #include <pthread.h>
 
-using namespace std;
-
 #include "../include/Coordinator.h"
 
+using namespace std;
 
 typedef struct param
 {
@@ -154,5 +154,8 @@ void Coordinator::recv(IMessageQueue *mq, Node *from, void *msg, int reply_code)
 		sem_post(&sNode_lock);
 	}
 	
-	else cout << "[Coord] Error in reply code\n";
+	else 
+	{
+		cout << "[Coord] Error in reply code\n";
+	}	
 }

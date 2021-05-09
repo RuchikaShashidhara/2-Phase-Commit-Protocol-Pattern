@@ -1,14 +1,15 @@
-#ifndef AMAZON
-#define AMAZON
+#ifndef AMAZON_H
+#define AMAZON_H
 
 #include <vector>
 #include <string>
 
-using namespace std;
+#include "DBSchema.h"
+#include "File.h"
+#include "DBFile.h"
+#include "Coordinator.h"
 
-#include "../include/DBSchema.h"
-#include "../include/File.h"
-#include "../include/DBFile.h"
+using namespace std;
 
 class Amazon
 {

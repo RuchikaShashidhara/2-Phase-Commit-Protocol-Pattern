@@ -1,20 +1,20 @@
-#ifndef WORKER
-#define WORKER
+#ifndef WORKER_H
+#define WORKER_H
 
 #include <vector>
 
 #include "Logs.h"
 #include "Mediator.h"
-#include "File.h"
+#include "DBFile.h"
 
 class Worker : public Node
 {
 	private:
-		File& fp;
+		DBFile& fp;
 		vector <Log_t *> logs;
 		
 	public:
-		Worker(File *fp);
+		Worker(DBFile *fp);
 		int prepare();
 		int releaseLock();
 		int commit(void* operation);

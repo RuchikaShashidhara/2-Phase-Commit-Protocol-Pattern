@@ -6,23 +6,17 @@
 
 using namespace std;
 
-/*
-*/
 DBSchema :: DBSchema(File* file_values_obj_ptr, vector<string>& schema) 
 {
     int row1 = file_values_obj_ptr -> addRecord(schema);
     __db_schema.assign(schema.begin(), schema.end());
 }
 
-/*
-*/
 DBSchema :: ~DBSchema() 
 {
 
 }
 
-/*
-*/
 int DBSchema :: __getRowNum(string id)
 {
     int row_num;
@@ -38,8 +32,6 @@ int DBSchema :: __getRowNum(string id)
     return row_num;
 }
 
-/*
-*/
 int DBSchema :: __getColNum(string schema_col_name) 
 {
     int col_num;
@@ -56,8 +48,6 @@ int DBSchema :: __getColNum(string schema_col_name)
     return col_num;
 }
 
-/*
-*/
 pair<bool, int> DBSchema :: getRowNumRecord(string id)
 {
     pair<bool, int> result_success_row_num;
@@ -77,8 +67,6 @@ pair<bool, int> DBSchema :: getRowNumRecord(string id)
     return result_success_row_num;
 }
 
-/*
-*/
 pair<bool, pair<int, int>> DBSchema :: getRowColNumsCell(string id, string schema_col_name) 
 {
     pair<bool, pair<int, int>> result_success_row_col_nums;
@@ -101,8 +89,6 @@ pair<bool, pair<int, int>> DBSchema :: getRowColNumsCell(string id, string schem
     return result_success_row_col_nums;
 }
 
-/*
-*/
 void DBSchema :: updateIdRowNum(int row_num, string id, int op_code)
 {
         if (op_code == 0)               // addRecord

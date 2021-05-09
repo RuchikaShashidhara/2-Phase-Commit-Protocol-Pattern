@@ -1,10 +1,10 @@
+#include <vector>
+
 #include "../include/Worker.h"
 
 using namespace std;
 
-#include <vector>
-
-Worker::Worker(File *fp) : fp(fp) {}
+Worker::Worker(DBFile *fp) : fp(*fp) {}
 
 int Worker::prepare()
 {
@@ -62,7 +62,4 @@ void Worker::recv(IMessageQueue *mq, Node *from, void *msg, int action_code)
 		response = this->commitRollback();
 	
 	this->send(mq, from, msg, response);		
-}
-		
-		
-		
+}		

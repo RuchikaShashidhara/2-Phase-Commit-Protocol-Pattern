@@ -1,11 +1,11 @@
 #include <iostream>
 #include <format>
 
-using namespace std;
-
 #include "../include/Mediator.h"
 #include "../include/Coordinator.h"
 #include "../include/Worker.h"
+
+using namespace std;
 
 Amazon::Amazon(string branch_name) : branch_name(branch_name) 
 {
@@ -167,4 +167,3 @@ int Amazon::makePayment()
 	++paymentCount;
   	string pid = std::format("c{}", paymentCount); 
 }	
-

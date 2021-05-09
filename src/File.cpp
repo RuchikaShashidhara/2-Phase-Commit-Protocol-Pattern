@@ -4,37 +4,27 @@
 
 using namespace std;
 
-/*
-*/
 File :: File(int num_of_row, int num_of_col)
 {
     __file_total_num_of_row = num_of_row;
     __file_total_num_of_col = num_of_col;
 }
 
-/*
-*/
 File :: ~File()
 {
 
 }
 
-/*
-*/
 int File :: getTotalRowNum()
 {
     return __file_total_num_of_row;
 }
 
-/*
-*/
 int File :: getTotalColNum()
 {
     return __file_total_num_of_col;
 }
 
-/*
-*/
 int File :: addRecord(vector<string> record_values)
 {
     int row_num = -1;
@@ -43,8 +33,6 @@ int File :: addRecord(vector<string> record_values)
     return row_num;
 }
 
-/*
-*/
 void File :: deleteRecord(int row) 
 { 
     if (row < __file_total_num_of_row)
@@ -53,8 +41,6 @@ void File :: deleteRecord(int row)
     }    
 }
 
-/*
-*/
 vector<string> File :: readRecord(int row)
 { 
     vector<string> record_values;
@@ -68,8 +54,6 @@ vector<string> File :: readRecord(int row)
     return record_values;
 }
 
-/*
-*/
 string File :: readCell(int row, int col) 
 {
     string cell_value;   
@@ -84,8 +68,6 @@ string File :: readCell(int row, int col)
     return cell_value;
 }
 
-/*
-*/
 void File :: updateRecord(int row, vector<string> record_values)
 {
     if (row < __file_total_num_of_row)
@@ -94,8 +76,6 @@ void File :: updateRecord(int row, vector<string> record_values)
     }    
 }
 
-/*
-*/
 void File :: updateCell(int row, int col, string value) 
 {
     if (row < __file_total_num_of_row && col < __file_total_num_of_col)

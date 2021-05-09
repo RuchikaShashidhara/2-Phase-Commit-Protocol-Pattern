@@ -1,5 +1,5 @@
-#ifndef COORDINATOR
-#define COORDINATOR
+#ifndef COORDINATOR_H
+#define COORDINATOR_H
 
 #include <vector>
 #include <semaphore.h>
@@ -31,4 +31,3 @@ class Coordinator : public Node
 };
 
 #endif
-

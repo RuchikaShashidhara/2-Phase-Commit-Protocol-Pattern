@@ -1,5 +1,5 @@
-#ifndef FILEHELPER_H
-#define FILEHELPER_H
+#ifndef DBFILE_H
+#define DBFILE_H
 
 #include <semaphore.h>
 #include <time.h>

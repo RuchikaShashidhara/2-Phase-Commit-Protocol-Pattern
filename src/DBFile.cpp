@@ -4,22 +4,16 @@
 
 using namespace std;
 
-/*
-*/
 DBFile :: DBFile(int num_of_row, int num_of_col) : File(num_of_col, num_of_row)
 {    
     sem_init(&__semaphore_lock, 0, 1);    
 }
 
-/*
-*/
 DBFile :: ~DBFile()
 {
     
 }
 
-/*
-*/
 bool DBFile :: acquire_lock(long sec, long nsec)
 {
     struct timespec ts;
@@ -42,15 +36,11 @@ bool DBFile :: acquire_lock(long sec, long nsec)
     return true;
 }
 
-/*
-*/
 void DBFile :: release_lock()
 {
     sem_post(&__semaphore_lock);
 }
 
-/*
-*/
 Log_t* DBFile :: read(Log_t *operation)
 {
     Log_t *log_read_value;
@@ -67,8 +57,6 @@ Log_t* DBFile :: read(Log_t *operation)
     return log_read_value;
 }
 
-/*
-*/
 Log_t* DBFile :: write(Log_t *operation)
 {
     Log_t *log_write_prev_value;
