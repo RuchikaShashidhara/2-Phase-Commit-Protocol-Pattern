@@ -180,7 +180,7 @@ int Amazon::updateUserDetails()
     
     else
     {
-        cout << "Invalid user ID\n";
+        cout << "Invalid user ID \n";
         return 0;
     }
 }	
