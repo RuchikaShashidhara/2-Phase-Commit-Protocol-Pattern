@@ -1,4 +1,5 @@
-#include <string>
+#include <iostream>
+#include <format>
 
 using namespace std;
 
@@ -8,7 +9,7 @@ using namespace std;
 
 Amazon::Amazon(string branch_name) : branch_name(branch_name) 
 {
-	this->customer_db = new File(10, 4);
+	this->customer_db = new DBFile(10, 4);
     vector<string> customer_col_names = {
         "customer_id", 
         "name", 
@@ -17,7 +18,7 @@ Amazon::Amazon(string branch_name) : branch_name(branch_name)
     };
     this->customer_db_schema = new DBSchema(customer_db, customer_col_names);
     
-    this->payment_db = new File(10, 5);
+    this->payment_db = new DBFile(10, 5);
     vector<string> payment_col_names = {
         "payment_id", 
         "customer_id", 
@@ -27,7 +28,7 @@ Amazon::Amazon(string branch_name) : branch_name(branch_name)
     };
     this->payment_db_schema = new DBSchema(payment_db, payment_col_names);
 
-    this->shipping_db = new File(10, 5);
+    this->shipping_db = new DBFile(10, 5);
     vector<string> shipping_col_names = {
         "shipping_id", 
         "payment_id", 
@@ -44,12 +45,36 @@ Amazon::Amazon(string branch_name) : branch_name(branch_name)
     this->coord = new Coordinator(3, vector <Worker *> (w1, w2, w3), mq);    
     
     userCount = 0;
-    transactionCount = 0;
+    paymentCount = 0;
 }
 
 string Amazon::registerUser(string name, int phno, string address)
 {
-	
+	++userCount; 
+  	string uid = std::format("c{}", userCount);  	
+  	string name, ph, addr;
+  	
+  	cout << "Enter user's name: ";
+  	cin >> name;
+  	
+  	cout << "Enter user's phone number: ";
+  	cin >> ph;
+  	
+  	cout << "Enter user's address: ";
+  	cin >> addr;
+  	
+	vector <string> new_record (uid, name, ph, addr);
+    Log_t op = {1, 2, -1, -1, new_record};
+    
+    vector <Log_t *> opList (&op, NULL, NULL);
+    int result = coord->performTransaction(opList);
+    
+    if(result == 1)
+    	cout << "User successfuly registered\n";
+    else cout << "Registration failed, please try again\n";
+    return 1;  	
+  	
+    customer_db_schema->updateIdRowNum(op.row, uid, 0);
 }	
 
 vector <string> Amazon::getUserDetails(string id)
@@ -120,7 +145,10 @@ int Amazon::updateUserDetails()
     	vector <string> new_record (id, "", "", "");
     	new_record[success_row_num.second.second] = value;
         Log_t op = {0, 0, success_row_num.second.first, success_row_num.second.second, new_record};
-        int result = coord->performTransaction(&op);
+        
+        vector <Log_t *> opList (&op, NULL, NULL);
+        int result = coord->performTransaction(opList);
+        
         if(result == 1)
         	cout << "Details successfuly updated\n";
         else cout << "Updation failed, please try again\n";
@@ -134,8 +162,9 @@ int Amazon::updateUserDetails()
     }
 }	
 
-int Amazon::makeTransaction()
+int Amazon::makePayment()
 {
-	
+	++paymentCount;
+  	string pid = std::format("c{}", paymentCount); 
 }	
 

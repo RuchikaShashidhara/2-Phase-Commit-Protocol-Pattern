@@ -153,4 +153,6 @@ void Coordinator::recv(IMessageQueue *mq, Node *from, void *msg, int reply_code)
 		successNodes.push_back(from);
 		sem_post(&sNode_lock);
 	}
+	
+	else cout << "[Coord] Error in reply code\n";
 }

@@ -8,6 +8,7 @@ using namespace std;
 
 #include "../include/DBSchema.h"
 #include "../include/File.h"
+#include "../include/DBFile.h"
 
 class Amazon
 {
@@ -26,7 +27,7 @@ class Amazon
 		Coordinator *coord;
 		
 		int userCount;
-		int transactionCount;
+		int paymentCount;
 	
 	public:
 		Amazon(string branch_name);
