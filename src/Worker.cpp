@@ -10,7 +10,7 @@ Worker::Worker(File *fp) : fp(dynamic_cast<DBFile*>(fp)) {}
 
 int Worker::prepare()
 {
-	if(fp->acquire_lock(2, 0) == true)
+	if(fp->acquire_lock(4, 0) == true)
 		return 1;
 	return 0;
 }
@@ -25,6 +25,8 @@ int Worker::commit(void *op)
 {
 	Log_t *operation = (Log_t *)op;
 	Log_t *oldLog = fp->write(operation);
+	
+	cout << "\t[Worker] op row: "<< operation->row << '\n';
 	
 	if(oldLog == NULL)
 		return 0;
@@ -50,7 +52,7 @@ void Worker::send(IMessageQueue *mq, Node *to, void *msg, int reply_code)
 
 void Worker::recv(IMessageQueue *mq, Node *from, void *msg, int action_code)
 {
-	cout << "[Worker"<<this<<"] Received action from "<< from << ": " << action_code << '\n';
+	cout << "[Worker "<< this <<"] Received action from "<< from << ": " << action_code << '\n';
 	int response;
 	if(action_code == 10)
 		response = this->prepare();

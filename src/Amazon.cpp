@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdio>
+#include <unistd.h>
 
 using namespace std;
 
@@ -80,7 +81,7 @@ int Amazon::registerUser()
     
     if(result == 1)
     {
-    	cout << "User successfuly registered, user ID: " << id << ">\n";  	
+    	cout << "User successfuly registered, user ID: " << id << "\n";  	
     	customer_db_schema->updateIdRowNum(op.row, uid, 0);
     	
     	return 1;  	
@@ -94,12 +95,11 @@ vector <string> Amazon::getUserDetails(string id)
 {	
     vector<string> record_values;
     pair<bool, int> success_row_num = customer_db_schema->getRowNumRecord(id);
-    if (success_row_num.first && dynamic_cast<DBFile*>(customer_db)->acquire_lock(0, 5000) == true)
+    if (success_row_num.first)
     {
     	cout << "[Amazon] Customer DB: " << customer_db << '\n';
         record_values = customer_db->readRecord(success_row_num.second);
-    	cout << "[Amazon] readRecord() works\n";        
-        dynamic_cast<DBFile*>(customer_db)->release_lock();       
+    	cout << "[Amazon] readRecord() works\n";              
     }
     else
     {
@@ -113,10 +113,9 @@ vector <string> Amazon::getTransactionDetails(string id)
 {
     vector<string> record_values;
     pair<bool, int> success_row_num = payment_db_schema->getRowNumRecord(id);
-    if (success_row_num.first && dynamic_cast<DBFile*>(payment_db)->acquire_lock(2, 0) == true)
+    if (success_row_num.first)
     {
         record_values = payment_db->readRecord(success_row_num.second);
-        dynamic_cast<DBFile*>(payment_db)->release_lock();   
     }
     else
     {
@@ -191,11 +190,11 @@ int Amazon::makePayment()
 	char id[20];
 	
 	++paymentCount; 	
-  	sprintf(id, "c%d", paymentCount); 
+  	sprintf(id, "p%d", paymentCount); 
   	string pid(id);; 
   	
 	++shippingCount;
-  	sprintf(id, "c%d", shippingCount);  
+  	sprintf(id, "s%d", shippingCount);  
   	string sid(id);
   	
   	string uid, amount, mode, location, delivered, timestamp;
@@ -221,15 +220,15 @@ int Amazon::makePayment()
     Log_t payment_op = {1, 2, -1, -1, paymentRecord};
     Log_t shipping_op = {1, 2, -1, -1, shippingRecord};
     
-    vector <Log_t *> opList = {NULL, &payment_op, &shipping_op};  	
+    vector <Log_t *> opList = {NULL, &payment_op, &shipping_op}; 	
     int result = coord->performTransaction(opList);
-    
     if(result == 1)
     {
     	cout << "Details successfuly updated, transaction ID = " << pid << "\n";  
-    	  	
-    	payment_db_schema->updateIdRowNum(payment_op.row, pid, 0);
+    	cout << "[Amazon] Shipping row no: " << shipping_op.row << "  Payment row no: " << payment_op.row << '\n';
     	shipping_db_schema->updateIdRowNum(shipping_op.row, sid, 0);
+    	payment_db_schema->updateIdRowNum(payment_op.row, pid, 0);
+    	
     	return 1;
     }
     

@@ -1,14 +1,29 @@
-execute: client_file_test.o DBSchema.o File.o
-	g++ client_file_test.o DBSchema.o File.o -Wall -pthread
+execute: client.o Amazon.o DBSchema.o File.o DBFile.o Mediator.o Worker.o Coordinator.o
+	g++ client.o Amazon.o DBSchema.o File.o DBFile.o Mediator.o Worker.o Coordinator.o -Wall -pthread	
+	
+client.o: client.cpp
+	g++ -c -std=c++2a client.cpp
 
-client_file_test.o: client_file_test.cpp src/DBSchema.cpp src/File.cpp
-	g++ -c client_file_test.cpp -Wall -pthread
+Amazon.o: src/Amazon.cpp
+	g++ -c -std=c++2a src/Amazon.cpp
 
 DBSchema.o: src/DBSchema.cpp File.o
-	g++ -c src/DBSchema.cpp
+	g++ -c -std=c++2a src/DBSchema.cpp
 
 File.o: src/File.cpp
-	g++ -c src/File.cpp -Wall -pthread
+	g++ -c -std=c++2a src/File.cpp -Wall
+	
+DBFile.o: src/DBFile.cpp 
+	g++ -c -std=c++2a src/DBFile.cpp -Wall -pthread
+	
+Mediator.o: src/Mediator.cpp
+	g++ -c -std=c++2a src/Mediator.cpp -Wall
+	
+Worker.o: src/Worker.cpp
+	g++ -c -std=c++2a src/Worker.cpp -Wall
+	
+Coordinator.o: src/Coordinator.cpp
+	g++ -c -std=c++2a src/Coordinator.cpp -Wall -pthread
 
 clean:
 	rm -rf *.o a.out

@@ -3,6 +3,9 @@
 #include <semaphore.h>
 #include <pthread.h>
 
+#include <unistd.h>
+
+
 using namespace std;
 
 #include "../include/Coordinator.h"
@@ -24,9 +27,10 @@ void *send_function(void *arg)
 	pthread_detach(pthread_self());
 	
 	param *p = (param *)arg;
-	cout << "[Coor] 2. Sending action code " << p->action_code << '\n';
-	cout << "[Coor] From: "<< p->from << " To: " << p->to << '\n';
+	cout << "[Coor] 2. Sending action code " << p->action_code <<  "[Coor] From: "<< p->from << " To: " << p->to << '\n';
 	(p->from)->send(p->mq, p->to, p->msg, p->action_code);
+	if(p->msg)
+		cout << "[Coord] 3. Row number: " << ((Log_t *)p->msg)->row << '\n';
 	
 	pthread_exit(NULL);	
 }
@@ -57,13 +61,15 @@ int Coordinator::performTransaction(vector <Log_t*> operation)
 	successNodes.clear();
 	failedNodes.clear();
 	
+	param p[workerCount];
+	
 	for(int i = 0; i<workerCount; ++i)
 	{
 		if(operation[i] != NULL)
 		{
-			param p = {this, this->mq, workerList[i], NULL, 10};
-			cout << "[Coor] 1. Sending action code " << p.action_code << '\n';
-			pthread_create(&pid[i], NULL, send_function, (void*)&p);
+			p[i] = {this, this->mq, workerList[i], NULL, 10};
+			cout << "[Coor] 1. Sending action code " << p[i].action_code << " to " << workerList[i] << '\n';
+			pthread_create(&pid[i], NULL, send_function, (void*)&p[i]);
 			cout << "[Coord] Created a thread\n";
 		}		
 	}
@@ -97,12 +103,13 @@ int Coordinator::performTransaction(vector <Log_t*> operation)
 	successNodes.clear();
 	failedNodes.clear();
 	
-	for(int i = 0; i<workerCount; ++i)
+	for(int i = workerCount-1; i>=0; --i)
 	{
 		if(operation[i] != NULL)
 		{
 			param p = {this, this->mq, workerList[i], (void *)operation[i], 20};
 			pthread_create(&pid[i], NULL, send_function, (void*)&p);	
+			sleep(0.3);
 		}	
 	}
 	
@@ -136,7 +143,8 @@ int Coordinator::performTransaction(vector <Log_t*> operation)
 	{
 		if(operation[i] != NULL)
 		{
-			param p = {this, this->mq, workerList[i], (void *)operation[i], 11};
+			cout << "\t[Coord] op row: "<< operation[i]->row << '\n';
+			param p = {this, this->mq, workerList[i], NULL, 11};
 			pthread_create(&pid[i], NULL, send_function, (void*)&p);
 		}		
 	}

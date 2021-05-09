@@ -50,7 +50,7 @@ int DBSchema :: __getColNum(string schema_col_name)
 
 pair<bool, int> DBSchema :: getRowNumRecord(string id)
 {
-	cout << "[DB Schema] Row ID : " << id << ">\n";
+	cout << "[DB Schema] Row ID : " << id << "\n";
     pair<bool, int> result_success_row_num;
     int row_num = __getRowNum(id);
 	cout << "[DB Schema] Row number of the given ID : " << row_num << ">\n";
