@@ -1,6 +1,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <iostream>
 
 using namespace std;
 
@@ -23,9 +24,10 @@ void IMessageQueue::detach(Node *nd)
 
 MessageQueue::MessageQueue(const string& name) : name(name) {}
 
-void MessageQueue::send(Node *to, void *msg, int action_code)
+void MessageQueue::send(Node *from, Node *to, void *msg, int action_code)
 {
-	to->recv(this, to, msg, action_code);
+	cout << "[MQ] Sending msg to worker " << action_code << '\n';
+	to->recv(this, from, msg, action_code);
 }
 
 

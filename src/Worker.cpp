@@ -1,5 +1,6 @@
 #include <vector>
 #include <algorithm>
+#include <iostream>
 
 using namespace std;
 
@@ -44,11 +45,12 @@ int Worker::commitRollback()
 
 void Worker::send(IMessageQueue *mq, Node *to, void *msg, int reply_code)
 {	
-	mq->send(to, msg, reply_code);
+	mq->send(this, to, msg, reply_code);
 }
 
 void Worker::recv(IMessageQueue *mq, Node *from, void *msg, int action_code)
 {
+	cout << "[Worker"<<this<<"] Received action from "<<from<<": " << action_code << '\n';
 	int response;
 	if(action_code == 10)
 		response = this->prepare();

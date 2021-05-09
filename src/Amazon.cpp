@@ -80,7 +80,7 @@ int Amazon::registerUser()
     
     if(result == 1)
     {
-    	cout << "User successfuly registered\n";  	
+    	cout << "User successfuly registered, user ID: " << id << "\n";  	
     	customer_db_schema->updateIdRowNum(op.row, uid, 0);
     	
     	return 1;  	
@@ -222,7 +222,8 @@ int Amazon::makePayment()
     
     if(result == 1)
     {
-    	cout << "Details successfuly updated\n";    	
+    	cout << "Details successfuly updated, transaction ID = " << pid << "\n";  
+    	  	
     	payment_db_schema->updateIdRowNum(payment_op.row, pid, 0);
     	shipping_db_schema->updateIdRowNum(shipping_op.row, sid, 0);
     	return 1;

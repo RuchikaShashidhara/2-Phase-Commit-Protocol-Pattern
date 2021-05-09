@@ -12,7 +12,7 @@ class IMessageQueue
 		virtual ~IMessageQueue() {}
 		virtual void attach(Node *);
 		virtual void detach(Node *);
-		virtual void send(Node *to, void *msg, int action_code) = 0;
+		virtual void send(Node *from, Node *to, void *msg, int action_code) = 0;
 	
 	protected:
 		vector <Node *> participants;
@@ -25,7 +25,7 @@ class MessageQueue : public IMessageQueue
 		
 	public:
 		MessageQueue(const string& name);
-		virtual void send(Node *to, void *msg, int action_code);
+		virtual void send(Node *from, Node *to, void *msg, int action_code);
 };
 
 class Node
