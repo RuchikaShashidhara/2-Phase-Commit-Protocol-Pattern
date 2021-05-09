@@ -37,7 +37,7 @@ int File :: getTotalColNum()
 
 /*
 */
-bool File :: aquire_lock()
+bool File :: acquire_lock()
 {
     int check_aquired = sem_timedwait(&__semaphore_lock, &__time_spec);
     if (check_aquired == 0)  //0 : The calling process successfully performed the semaphore lock operation

@@ -24,7 +24,7 @@ class File
         ~File();
         int getTotalRowNum();
         int getTotalColNum();
-        bool aquire_lock();
+        bool acquire_lock();
         void release_lock();
         int addRecord(vector<string> record_values);                //op_code = 0
         void deleteRecord(int row);                                 //op_code = 1

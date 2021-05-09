@@ -8,12 +8,12 @@ using namespace std;
 
 /* IMessageQueue */
 
-virtual void IMessageQueue::attach(Node *nd)
+void IMessageQueue::attach(Node *nd)
 {
 	participants.push_back(nd);
 }
 
-virtual void IMessageQueue::detach(Node *nd)
+void IMessageQueue::detach(Node *nd)
 {
 	erase(participants, nd);
 }
@@ -23,7 +23,7 @@ virtual void IMessageQueue::detach(Node *nd)
 
 MessageQueue::MessageQueue(const string& name) : name(name) {}
 
-virtual void MessageQueue::send(Node *to, void *msg, int action_code)
+void MessageQueue::send(Node *to, void *msg, int action_code)
 {
 	to->recv(this, to, msg, action_code);
 }
@@ -31,12 +31,12 @@ virtual void MessageQueue::send(Node *to, void *msg, int action_code)
 
 /* Node */
 
-virtual void Node::join(IMessageQueue *mq)
+void Node::join(IMessageQueue *mq)
 {
 	mq->attach(this);
 }
 
-virtual void Node::leave(IMessageQueue *mq)
+void Node::leave(IMessageQueue *mq)
 {
 	mq->detach(this);
 }

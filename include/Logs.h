@@ -16,8 +16,7 @@ struct Log
 		// 30 - update cell
 	int row;
 	int col;
-	string old_value;
-	string new_value;
+	vector <string> value;
 };
 
 typedef struct Log Log_t;

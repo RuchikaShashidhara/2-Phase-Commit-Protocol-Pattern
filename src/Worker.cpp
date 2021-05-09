@@ -8,7 +8,7 @@ Worker::Worker(File& fp) : fp(fp) {}
 
 int Worker::prepare()
 {
-	if(fp.acquire_lock(3000) == true)
+	if(fp.acquire_lock() == true)
 		return 1;
 	return 0;
 }
@@ -24,7 +24,7 @@ int Worker::commit(void *op)
 	Log_t *operation = (Log_t *)op;
 	if(fp.write(operation) == true)
 	{
-		logs.append(operation);
+		logs.push_back(operation);
 		return 1;
 	}
 	return 0;
@@ -33,8 +33,10 @@ int Worker::commit(void *op)
 int Worker::commitRollback()
 {
 	logs.pop_back();
+	#if 0
 	Log_t oldOperation = *(logs.rbegin()+1);
 	fp.write(oldOperation);
+	#endif
 	fp.release_lock();
 	return 1;
 }
@@ -51,7 +53,7 @@ void Worker::recv(IMessageQueue *mq, Node *from, void *msg, int action_code)
 		response = this->prepare();
 	
 	else if(action_code == 11)
-		response = this->prepareRollback();
+		response = this->releaseLock();
 		
 	else if(action_code == 20)
 		response = this->commit(msg);

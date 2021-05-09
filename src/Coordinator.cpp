@@ -1,10 +1,11 @@
-#include "../include/Coordinator.h"
-
-using namespace std;
-
 #include <vector>
 #include <semaphore.h>
 #include <pthread.h>
+
+using namespace std;
+
+#include "../include/Coordinator.h"
+
 
 typedef struct param
 {
@@ -27,14 +28,14 @@ void *send_function(void *arg)
 	pthread_exit(NULL);	
 }
 
-Coordinator::Coordinator(int workerCount, vector <File&> fileList, IMessageQueue *mq)
+Coordinator::Coordinator(int workerCount, vector <Node*> workers, IMessageQueue *mq)
 {
 	this->workerCount = workerCount;
 	this->mq = mq;
 	
-	for(auto file : fileList)
+	for(auto node : workers)
 	{
-		workerList.append(Worker(file));
+		workerList.push_back(node);
 	}
 	
 	sem_init(&sNode_lock, 0, 1);
@@ -53,30 +54,30 @@ int Coordinator::performTransaction(vector <Log_t*> operation)
 	{
 		if(operation[i] == NULL) break;
 		param p = {this, this->mq, workerList[i], NULL, 10};
-		pthread_create(&pid[i], NULL, send_function, (void*)p);		
+		pthread_create(&pid[i], NULL, send_function, (void*)&p);		
 	}
 	
 	for(int i = workerCount-1; i>=0; --i)
 	{
 		if(operation[i] == NULL) break;
-		pthread_join(&pid[i]);
+		pthread_join(pid[i], NULL);
 	}
 	
 	if(!failedNodes.empty())
 	{		
-		for(int i = 0; i<workerCount; ++i)
+		int i = 0;
+		for(auto node : successNodes)
 		{
-			if(operation[i] == NULL) break;
-			param p = {this, this->mq, workerList[i], NULL, 11};
-			pthread_create(&pid[i], NULL, send_function, (void*)p);		
+			param p = {this, this->mq, node, NULL, 11};
+			pthread_create(&pid[i++], NULL, send_function, (void*)&p);		
 		}
 		
-		for(int i = workerCount-1; i>=0; --i)
+		while(--i >= 0)
 		{
-			if(operation[i] == NULL) break;
-			pthread_join(&pid[i]);
+			pthread_join(pid[i], NULL);
 		}
 		
+		/* prepare phase failed */
 		return 0;
 	}
 	
@@ -88,34 +89,48 @@ int Coordinator::performTransaction(vector <Log_t*> operation)
 	{
 		if(operation[i] == NULL) break;
 		param p = {this, this->mq, workerList[i], (void *)operation[i], 20};
-		pthread_create(&pid[i], NULL, send_function, (void*)p);		
+		pthread_create(&pid[i], NULL, send_function, (void*)&p);		
 	}
 	
 	for(int i = workerCount-1; i>=0; --i)
 	{
 		if(operation[i] == NULL) break;
-		pthread_join(&pid[i]);
+		pthread_join(pid[i], NULL);
 	}
 	
 	if(!failedNodes.empty())
 	{		
-		for(int i = 0; i<workerCount; ++i)
+		int i = 0;
+		for(auto node : successNodes)
 		{
-			if(operation[i] == NULL) break;
-			param p = {this, this->mq, workerList[i], NULL, 21};
-			pthread_create(&pid[i], NULL, send_function, (void*)p);		
+			param p = {this, this->mq, node, NULL, 21};
+			pthread_create(&pid[i++], NULL, send_function, (void*)&p);		
 		}
 		
-		for(int i = workerCount-1; i>=0; --i)
+		while(--i >= 0)
 		{
-			if(operation[i] == NULL) break;
-			pthread_join(&pid[i]);
+			pthread_join(pid[i], NULL);
 		}
 		
+		/* prepare phase failed */
 		return 0;
-	}	
+	}
 	
+	/* transaction complete, release all locks */
+	for(int i = 0; i<workerCount; ++i)
+	{
+		if(operation[i] == NULL) break;
+		param p = {this, this->mq, workerList[i], (void *)operation[i], 11};
+		pthread_create(&pid[i], NULL, send_function, (void*)&p);		
+	}
 	
+	for(int i = workerCount-1; i>=0; --i)
+	{
+		if(operation[i] == NULL) break;
+		pthread_join(pid[i], NULL);
+	}
+	
+	return 1;
 }
 
 void Coordinator::send(IMessageQueue *mq, Node *to, void *msg, int action_code)
