@@ -44,11 +44,17 @@ Amazon::Amazon(string branch_name) : branch_name(branch_name)
     Worker *w3 = new Worker(this->shipping_db);
     this->coord = new Coordinator(3, vector <Worker *> (w1, w2, w3), mq);    
     
+    this->coord.join(mq);
+    w1.join(mq);
+    w2.join(mq);
+    w3.join(mq);
+    
     userCount = 0;
     paymentCount = 0;
+    shippingCount = 0;
 }
 
-string Amazon::registerUser(string name, int phno, string address)
+string Amazon::registerUser()
 {
 	++userCount; 
   	string uid = std::format("c{}", userCount);  	
@@ -70,11 +76,15 @@ string Amazon::registerUser(string name, int phno, string address)
     int result = coord->performTransaction(opList);
     
     if(result == 1)
-    	cout << "User successfuly registered\n";
+    {
+    	cout << "User successfuly registered\n";  	
+    	customer_db_schema->updateIdRowNum(op.row, uid, 0);
+    	
+    	return 1;  	
+    }
+    
     else cout << "Registration failed, please try again\n";
-    return 1;  	
-  	
-    customer_db_schema->updateIdRowNum(op.row, uid, 0);
+    return 0;
 }	
 
 vector <string> Amazon::getUserDetails(string id)
@@ -150,14 +160,20 @@ int Amazon::updateUserDetails()
         int result = coord->performTransaction(opList);
         
         if(result == 1)
+        {
         	cout << "Details successfuly updated\n";
-        else cout << "Updation failed, please try again\n";
-        return 1;
+        	return 1;
+        }
+        else
+        {
+        	cout << "Updation failed, please try again\n";
+        	return 0;
+        }
     }
     
     else
     {
-        cout << "Invalid user ID, please try again\n";
+        cout << "Invalid user ID\n";
         return 0;
     }
 }	
@@ -165,5 +181,46 @@ int Amazon::updateUserDetails()
 int Amazon::makePayment()
 {
 	++paymentCount;
-  	string pid = std::format("c{}", paymentCount); 
+  	string pid = format("c{}", paymentCount); 
+  	
+	++shippingCount;
+  	string sid = format("c{}", shippingCount); 
+  	
+  	string uid, amount, mode, location, delivered, timestamp;
+  	
+  	cout << "Enter customer ID: ";
+  	cin >> uid;
+  	
+  	cout << "Enter payment amount: ";
+  	cin >> amount;
+  	
+  	cout << "Enter mode of payment: ";
+  	cin >> mode;
+  	
+  	cout << "Enter delivery location: ";
+  	cin >> location;
+  	
+  	delivery = "false";
+  	timestamp = "now";
+  	
+  	vector <string> paymentRecord (pid, uid, amount, mode, timestamp);
+  	vector <string> shippingRecord (sid, pid, location, delivered, timestamp);  	
+  	
+    Log_t payment_op = {1, 2, -1, -1, paymentRecord};
+    Log_t shipping_op = {1, 2, -1, -1, shippingRecord};
+    
+    vector <Log_t *> opList (NULL, &payment_op, &shipping_op);  	
+    int result = coord->performTransaction(opList);
+    
+    if(result == 1)
+    {
+    	cout << "Details successfuly updated\n";    	
+    	payment_db_schema->updateIdRowNum(payment_op.row, pid, 0);
+    	shipping_db_schema->updateIdRowNum(shipping_op.row, sid, 0);
+    	return 1;
+    }
+    
+    else cout << "Updation failed, please try again\n";
+    return 0;
+  	
 }	

@@ -29,6 +29,7 @@ class Amazon
 		
 		int userCount;
 		int paymentCount;
+		int shippingCount;
 	
 	public:
 		Amazon(string branch_name);
