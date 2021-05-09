@@ -10,7 +10,7 @@ void readRecord(File* file_obj_ptr, DBSchema *db_schema_obj, string id);
 void readCell(File* file_obj_ptr, DBSchema *db_schema_obj, string id, string schema_col_name);
 void updateRecord(File* file_obj_ptr, DBSchema *db_schema_obj, string id, vector<string> record_values);
 void updateCell(File* file_obj_ptr, DBSchema *db_schema_obj, string id, string schema_col_name, string value);
-
+ 
 int main()
 {
     cout << "\n\n----- client_file_test without multi-threading -----\n\n";

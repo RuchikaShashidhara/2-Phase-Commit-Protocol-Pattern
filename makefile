@@ -11,4 +11,4 @@ File.o: src/File.cpp
 	g++ -c src/File.cpp -Wall -pthread
 
 clean:
-	rm *.o a.out
+	rm -rf *.o a.out

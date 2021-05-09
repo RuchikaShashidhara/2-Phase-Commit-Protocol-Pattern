@@ -1,8 +1,10 @@
 #include <iostream>
+#include <vector>
+
+using namespace std;
 
 #include "../include/DBFile.h"
 
-using namespace std;
 
 DBFile :: DBFile(int num_of_row, int num_of_col) : File(num_of_col, num_of_row)
 {    

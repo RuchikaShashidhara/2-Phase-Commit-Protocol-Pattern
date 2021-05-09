@@ -1,43 +1,44 @@
 #include <vector>
-
-#include "../include/Worker.h"
+#include <algorithm>
 
 using namespace std;
 
-Worker::Worker(File *fp) : fp(*fp) {}
+#include "../include/Worker.h"
+
+Worker::Worker(File *fp) : fp(dynamic_cast<DBFile*>(fp)) {}
 
 int Worker::prepare()
 {
-	if(fp.acquire_lock(2, 0) == true)
+	if(fp->acquire_lock(2, 0) == true)
 		return 1;
 	return 0;
 }
 
 int Worker::releaseLock()
 {
-	fp.release_lock();
+	fp->release_lock();
 	return 1;
 }
 
 int Worker::commit(void *op)
 {
 	Log_t *operation = (Log_t *)op;
-	if(fp.write(operation) == true)
-	{
-		logs.push_back(operation);
-		return 1;
-	}
-	return 0;
+	Log_t *oldLog = fp->write(operation);
+	
+	if(oldLog == NULL)
+		return 0;
+		
+	logs.push_back(oldLog);
+	return 1;
 }
 
 int Worker::commitRollback()
 {
+	Log_t *oldOperation = *(logs.rbegin()+1);
 	logs.pop_back();
-	#if 0
-	Log_t oldOperation = *(logs.rbegin()+1);
-	fp.write(oldOperation);
-	#endif
-	fp.release_lock();
+	fp->write(oldOperation);
+	
+	fp->release_lock();
 	return 1;
 }
 

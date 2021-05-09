@@ -157,6 +157,7 @@ int Amazon::updateUserDetails()
     {
     	vector <string> new_record = {uid, "", "", ""};
     	new_record[success_row_num.second.second] = value;
+    	
         Log_t op = {0, 0, success_row_num.second.first, success_row_num.second.second, new_record};
         
         vector <Log_t *> opList = {&op, NULL, NULL};
@@ -228,6 +229,5 @@ int Amazon::makePayment()
     }
     
     else cout << "Updation failed, please try again\n";
-    return 0;
-  	
+    return 0;  	
 }	

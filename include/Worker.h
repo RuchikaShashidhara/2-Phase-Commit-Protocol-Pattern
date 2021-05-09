@@ -5,12 +5,13 @@
 
 #include "Logs.h"
 #include "Mediator.h"
+#include "File.h"
 #include "DBFile.h"
 
 class Worker : public Node
 {
 	private:
-		File *fp;
+		DBFile *fp;
 		vector <Log_t *> logs;
 		
 	public:

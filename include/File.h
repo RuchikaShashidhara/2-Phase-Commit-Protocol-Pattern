@@ -17,15 +17,15 @@ class File
 
     public:
         File(int num_of_row, int num_of_col);
-        ~File();
-        int getTotalRowNum();
-        int getTotalColNum();
-        int addRecord(vector<string> record_values);                
-        void deleteRecord(int row);                                 
-        vector<string> readRecord(int row);                         
-        string readCell(int row, int col);                        
-        void updateRecord(int row, vector<string> record_values);   
-        void updateCell(int row, int col, string value);            
+        virtual ~File();
+        virtual int getTotalRowNum();
+        virtual int getTotalColNum();
+        virtual int addRecord(vector<string> record_values);                
+        virtual void deleteRecord(int row);                                 
+        virtual vector<string> readRecord(int row);                         
+        virtual string readCell(int row, int col);                        
+        virtual void updateRecord(int row, vector<string> record_values);   
+        virtual void updateCell(int row, int col, string value);            
 };
 
 #endif

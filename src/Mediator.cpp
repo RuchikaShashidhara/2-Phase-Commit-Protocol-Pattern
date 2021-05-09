@@ -2,9 +2,9 @@
 #include <vector>
 #include <algorithm>
 
-#include "../include/Mediator.h"
-
 using namespace std;
+
+#include "../include/Mediator.h"
 
 /* IMessageQueue */
 

@@ -3,9 +3,10 @@
 #include <semaphore.h>
 #include <pthread.h>
 
+using namespace std;
+
 #include "../include/Coordinator.h"
 
-using namespace std;
 
 typedef struct param
 {
@@ -52,19 +53,22 @@ int Coordinator::performTransaction(vector <Log_t*> operation)
 	
 	for(int i = 0; i<workerCount; ++i)
 	{
-		if(operation[i] == NULL) break;
-		param p = {this, this->mq, workerList[i], NULL, 10};
-		pthread_create(&pid[i], NULL, send_function, (void*)&p);		
+		if(operation[i] != NULL)
+		{
+			param p = {this, this->mq, workerList[i], NULL, 10};
+			pthread_create(&pid[i], NULL, send_function, (void*)&p);
+		}		
 	}
 	
 	for(int i = workerCount-1; i>=0; --i)
 	{
-		if(operation[i] == NULL) break;
-		pthread_join(pid[i], NULL);
+		if(operation[i] != NULL)
+			pthread_join(pid[i], NULL);
 	}
 	
 	if(!failedNodes.empty())
 	{		
+		/* prepare rollback */
 		int i = 0;
 		for(auto node : successNodes)
 		{
@@ -87,19 +91,22 @@ int Coordinator::performTransaction(vector <Log_t*> operation)
 	
 	for(int i = 0; i<workerCount; ++i)
 	{
-		if(operation[i] == NULL) break;
-		param p = {this, this->mq, workerList[i], (void *)operation[i], 20};
-		pthread_create(&pid[i], NULL, send_function, (void*)&p);		
+		if(operation[i] != NULL)
+		{
+			param p = {this, this->mq, workerList[i], (void *)operation[i], 20};
+			pthread_create(&pid[i], NULL, send_function, (void*)&p);	
+		}	
 	}
 	
 	for(int i = workerCount-1; i>=0; --i)
 	{
-		if(operation[i] == NULL) break;
-		pthread_join(pid[i], NULL);
+		if(operation[i] != NULL)
+			pthread_join(pid[i], NULL);
 	}
 	
 	if(!failedNodes.empty())
 	{		
+		/* commit rollback */
 		int i = 0;
 		for(auto node : successNodes)
 		{
@@ -119,15 +126,17 @@ int Coordinator::performTransaction(vector <Log_t*> operation)
 	/* transaction complete, release all locks */
 	for(int i = 0; i<workerCount; ++i)
 	{
-		if(operation[i] == NULL) break;
-		param p = {this, this->mq, workerList[i], (void *)operation[i], 11};
-		pthread_create(&pid[i], NULL, send_function, (void*)&p);		
+		if(operation[i] != NULL)
+		{
+			param p = {this, this->mq, workerList[i], (void *)operation[i], 11};
+			pthread_create(&pid[i], NULL, send_function, (void*)&p);
+		}		
 	}
 	
 	for(int i = workerCount-1; i>=0; --i)
 	{
-		if(operation[i] == NULL) break;
-		pthread_join(pid[i], NULL);
+		if(operation[i] != NULL)
+			pthread_join(pid[i], NULL);
 	}
 	
 	return 1;
