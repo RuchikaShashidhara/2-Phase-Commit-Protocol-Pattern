@@ -5,10 +5,9 @@ using namespace std;
 
 #include "../include/DBFile.h"
 
-
 DBFile :: DBFile(int num_of_row, int num_of_col) : File(num_of_col, num_of_row)
 {    
-    sem_init(&__semaphore_lock, 0, 1);    
+    sem_init(&__semaphore_lock, 1, 1);    
 }
 
 DBFile :: ~DBFile()
@@ -18,7 +17,7 @@ DBFile :: ~DBFile()
 
 bool DBFile :: acquire_lock(long sec, long nsec)
 {
-	#if 0
+	#if 1
     struct timespec ts;
     if (clock_gettime(CLOCK_REALTIME, &ts) == -1)   // if error is thrown, no lock is acquired & semaphore is unchanged.
     {
@@ -30,7 +29,7 @@ bool DBFile :: acquire_lock(long sec, long nsec)
 
     int check_aquired = sem_timedwait(&__semaphore_lock, &ts);
     #endif
-    int check_aquired = sem_trywait(&__semaphore_lock);
+    //int check_aquired = sem_trywait(&__semaphore_lock);
     if (check_aquired == 0)  //0 : The calling process successfully performed the semaphore lock operation
     {
         return true;

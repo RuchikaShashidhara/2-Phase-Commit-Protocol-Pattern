@@ -48,8 +48,8 @@ Coordinator::Coordinator(int workerCount, vector <Node*> workers, IMessageQueue 
 	}
 	cout << '\n';
 	
-	sem_init(&sNode_lock, 0, 1);
-	sem_init(&fNode_lock, 0, 1);
+	sem_init(&sNode_lock, 1, 1);
+	sem_init(&fNode_lock, 1, 1);
 }
 	
 int Coordinator::performTransaction(vector <Log_t*> operation)
