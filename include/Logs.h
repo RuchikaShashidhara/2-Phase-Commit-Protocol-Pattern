@@ -7,13 +7,13 @@ using namespace std;
 
 struct Log
 {
-	int op_code;
-		// 0  - add record
-		// 1  - delete record
-		// 2  - read record
-		// 20 - read cell
-		// 3  - update record
-		// 30 - update cell
+	int record_op;
+		// 1 = true
+		// 0 = false => cell operation
+	int read_op;
+		//1 = true
+		//0 = false => write(update) operation
+		//2 => add new record operation
 	int row;
 	int col;
 	vector <string> value;
