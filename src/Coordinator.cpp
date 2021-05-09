@@ -109,7 +109,7 @@ int Coordinator::performTransaction(vector <Log_t*> operation)
 		{
 			param p = {this, this->mq, workerList[i], (void *)operation[i], 20};
 			pthread_create(&pid[i], NULL, send_function, (void*)&p);	
-			sleep(0.3);
+			sleep(1);
 		}	
 	}
 	
