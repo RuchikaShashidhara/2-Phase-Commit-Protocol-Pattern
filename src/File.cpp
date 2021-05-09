@@ -43,14 +43,13 @@ void File :: deleteRecord(int row)
 
 vector<string> File :: readRecord(int row)
 { 
+	//cout << "[File] Entered readRecord\n";
     vector<string> record_values;
     if (row < __file_total_num_of_row)
     {
-        for(int ci = 0; ci < __file_total_num_of_col; ci++)
-        {
-            record_values.push_back(__file_values[row][ci]);
-        }
-    }    
+		//cout << "[File] Passed if condition\n";
+		return __file_values[row];
+    }        
     return record_values;
 }
 

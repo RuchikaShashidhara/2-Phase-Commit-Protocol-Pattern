@@ -83,6 +83,7 @@ Log_t* DBFile :: write(Log_t *operation)
     else if (operation->read_op == 2)   //add record operation
     {
         log_write_prev_value->row = addRecord(operation->value);
+        operation->row = log_write_prev_value->row;
     }
 
     return log_write_prev_value;

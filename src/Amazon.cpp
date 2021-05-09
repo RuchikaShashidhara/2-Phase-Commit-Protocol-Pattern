@@ -80,7 +80,7 @@ int Amazon::registerUser()
     
     if(result == 1)
     {
-    	cout << "User successfuly registered, user ID: " << id << "\n";  	
+    	cout << "User successfuly registered, user ID: " << id << ">\n";  	
     	customer_db_schema->updateIdRowNum(op.row, uid, 0);
     	
     	return 1;  	
@@ -94,9 +94,11 @@ vector <string> Amazon::getUserDetails(string id)
 {	
     vector<string> record_values;
     pair<bool, int> success_row_num = customer_db_schema->getRowNumRecord(id);
-    if (success_row_num.first && dynamic_cast<DBFile*>(customer_db)->acquire_lock(2, 0) == true)
+    if (success_row_num.first && dynamic_cast<DBFile*>(customer_db)->acquire_lock(0, 5000) == true)
     {
+    	cout << "[Amazon] Customer DB: " << customer_db << '\n';
         record_values = customer_db->readRecord(success_row_num.second);
+    	cout << "[Amazon] readRecord() works\n";        
         dynamic_cast<DBFile*>(customer_db)->release_lock();       
     }
     else
