@@ -15,7 +15,6 @@ using namespace std;
 class DBSchema
 {
     private:
-        File* __file_values_ptr;
         map<string, int> __id_row_num;
         vector<string> __db_schema;
         int __getRowNum(string id);

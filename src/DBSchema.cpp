@@ -10,8 +10,7 @@ using namespace std;
 */
 DBSchema :: DBSchema(File* file_values_obj_ptr, vector<string>& schema) 
 {
-    __file_values_ptr = file_values_obj_ptr;
-    int row1 = __file_values_ptr -> addRecord(schema);
+    int row1 = file_values_obj_ptr -> addRecord(schema);
     __db_schema.assign(schema.begin(), schema.end());
 }
 
@@ -19,7 +18,7 @@ DBSchema :: DBSchema(File* file_values_obj_ptr, vector<string>& schema)
 */
 DBSchema :: ~DBSchema() 
 {
-    __file_values_ptr = NULL;
+
 }
 
 /*
