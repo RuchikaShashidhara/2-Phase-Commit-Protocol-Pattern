@@ -1,30 +1,32 @@
 #include <iostream>
 
-#include "../include/FileHelper.h"
+#include "../include/DBFile.h"
 
 using namespace std;
 
 /*
 */
-FileHelper :: FileHelper(File *file_values_ptr)
+DBFile :: DBFile(int num_of_row, int num_of_col) : File(num_of_col, num_of_row)
 {    
-    __file_values_ptr = file_values_ptr;
-    sem_init(&__semaphore_lock, 0, 1);
+    sem_init(&__semaphore_lock, 0, 1);    
 }
 
 /*
 */
-FileHelper :: ~FileHelper()
+DBFile :: ~DBFile()
 {
-    __file_values_ptr = NULL;
+    
 }
 
 /*
 */
-bool FileHelper :: acquire_lock(long sec, long nsec)
+bool DBFile :: acquire_lock(long sec, long nsec)
 {
     struct timespec ts;
-    clock_gettime(CLOCK_REALTIME, &ts); //doubt: errors can occur, should it be handled?
+    if (clock_gettime(CLOCK_REALTIME, &ts) == -1)   // if error is thrown, no lock is acquired & semaphore is unchanged.
+    {
+        return false;
+    } 
     ts.tv_sec += sec;
     ts.tv_nsec += nsec;
 
@@ -42,14 +44,14 @@ bool FileHelper :: acquire_lock(long sec, long nsec)
 
 /*
 */
-void FileHelper :: release_lock()
+void DBFile :: release_lock()
 {
     sem_post(&__semaphore_lock);
 }
 
 /*
 */
-Log_t* FileHelper :: read(Log_t *operation)
+Log_t* DBFile :: read(Log_t *operation)
 {
     Log_t *log_read_value;
     log_read_value->record_op = operation->record_op;
@@ -59,7 +61,7 @@ Log_t* FileHelper :: read(Log_t *operation)
 
     if (operation->read_op == 1) //read operation
     { 
-        log_read_value->value = __file_values_ptr->readRecord(operation->row);
+        log_read_value->value = readRecord(operation->row);
     }
 
     return log_read_value;
@@ -67,7 +69,7 @@ Log_t* FileHelper :: read(Log_t *operation)
 
 /*
 */
-Log_t* FileHelper:: write(Log_t *operation)
+Log_t* DBFile :: write(Log_t *operation)
 {
     Log_t *log_write_prev_value;
     log_write_prev_value->record_op = operation->record_op;
@@ -77,20 +79,20 @@ Log_t* FileHelper:: write(Log_t *operation)
     {
         log_write_prev_value->row = operation->row;
         log_write_prev_value->col = operation->col;
-        log_write_prev_value->value = __file_values_ptr->readRecord(operation->row);
+        log_write_prev_value->value = readRecord(operation->row);
 
         if (operation->record_op == 1)  //update record operation
         {
-            __file_values_ptr->updateRecord(operation->row, operation->value);
+            updateRecord(operation->row, operation->value);
         }
         else    //update cell operation
         {
-            __file_values_ptr->updateCell(operation->row, operation->col, operation->value[operation->col]);
+            updateCell(operation->row, operation->col, operation->value[operation->col]);
         }
     }
     else if (operation->read_op == 2)   //add record operation
     {
-        log_write_prev_value->row = __file_values_ptr->addRecord(operation->value);
+        log_write_prev_value->row = addRecord(operation->value);
     }
 
     return log_write_prev_value;

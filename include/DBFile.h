@@ -7,15 +7,14 @@
 #include "Logs.h"
 #include "File.h"
 
-class FileHelper
+class DBFile : public File
 {
     private:
         sem_t __semaphore_lock;
-        File *__file_values_ptr;    //doubt - should it be associaton / inheritance ?
 
     public:
-        FileHelper(File *file_values_ptr);
-        ~FileHelper();
+        DBFile(int num_of_row, int num_of_col);
+        ~DBFile();
         bool acquire_lock(long sec, long nsec);
         void release_lock();
         Log_t* read(Log_t *operation);
