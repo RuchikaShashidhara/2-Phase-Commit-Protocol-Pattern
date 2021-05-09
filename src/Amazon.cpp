@@ -94,9 +94,10 @@ vector <string> Amazon::getUserDetails(string id)
 {	
     vector<string> record_values;
     pair<bool, int> success_row_num = customer_db_schema->getRowNumRecord(id);
-    if (success_row_num.first)
+    if (success_row_num.first && dynamic_cast<DBFile*>(customer_db)->acquire_lock(2, 0) == true)
     {
         record_values = customer_db->readRecord(success_row_num.second);
+        dynamic_cast<DBFile*>(customer_db)->release_lock();       
     }
     else
     {
@@ -110,9 +111,10 @@ vector <string> Amazon::getTransactionDetails(string id)
 {
     vector<string> record_values;
     pair<bool, int> success_row_num = payment_db_schema->getRowNumRecord(id);
-    if (success_row_num.first)
+    if (success_row_num.first && dynamic_cast<DBFile*>(payment_db)->acquire_lock(2, 0) == true)
     {
         record_values = payment_db->readRecord(success_row_num.second);
+        dynamic_cast<DBFile*>(payment_db)->release_lock();   
     }
     else
     {
