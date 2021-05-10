@@ -22,14 +22,33 @@ int Worker::releaseLock()
 }
 
 int Worker::commit(void *op)
-{
+{	
 	Log_t *operation = (Log_t *)op;
 	Log_t *oldLog = fp->write(operation);
 	
 	if(oldLog == NULL)
 		return 0;
+		/*
+	cout << "Record operatoin: " << op->record_op << '\n';
+	cout << "Read operatoin: " << op->read_op << '\n';
+	cout << "Row value: " << op->row << '\n';
+	cout << "Column value: " << op->col << '\n';
+	for(auto it: op->value)
+		cout << it << ' ';
+	cout << '\n';*/
 		
 	logs.push_back(oldLog);	
+	
+	cout << "[Worker "<< this <<"] Current log: \n";
+	cout << "\tRecord operation: " << oldLog->record_op << '\n';
+	cout << "\tRead operation: " << oldLog->read_op << '\n';
+	cout << "\tRow value: " << oldLog->row << '\n';
+	cout << "\tColumn value: " << oldLog->col << '\n';
+	
+	for(auto it: oldLog->value)
+		cout << it << ' ';
+	cout << '\n';
+	
 	cout << "[Worker "<< this <<"] Update worked\n";
 	return 1;
 }

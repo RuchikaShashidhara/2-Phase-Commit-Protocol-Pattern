@@ -5,9 +5,9 @@ using namespace std;
 
 #include "../include/DBFile.h"
 
-DBFile :: DBFile(int num_of_row, int num_of_col, int sem_value) : File(num_of_col, num_of_row)
+DBFile :: DBFile(int num_of_row, int num_of_col) : File(num_of_col, num_of_row)
 {    
-    sem_init(&__semaphore_lock, 1, sem_value);    
+    sem_init(&__semaphore_lock, 1, 1);    
 }
 
 DBFile :: ~DBFile()
@@ -65,6 +65,7 @@ Log_t* DBFile :: write(Log_t *operation)
 
     if (operation->read_op == 0)    //update operation
     {
+    	return NULL;
         log_write_prev_value->row = operation->row;
         log_write_prev_value->col = operation->col;
         log_write_prev_value->value = readRecord(operation->row);
@@ -87,6 +88,7 @@ Log_t* DBFile :: write(Log_t *operation)
     }
     else if (operation->read_op == 3)	//delete record operation
     {
+		cout << "[DBFile] Deleting record\n";
     	deleteRecord(operation->row);
     	return NULL;
     }

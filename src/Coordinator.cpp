@@ -115,7 +115,7 @@ int Coordinator::performTransaction(vector <Log_t*> operation)
 		{
 			pthread_join(pid[i], NULL);
 		}
-		
+		cout << "[Coor] Prepare failed \n";
 		/* prepare phase failed */
 		return 0;
 	}
@@ -142,18 +142,24 @@ int Coordinator::performTransaction(vector <Log_t*> operation)
 	
 	if(!failedNodes.empty())
 	{		
+		cout << "[Coor] Commit failed \n";
 		/* commit rollback */
-		int i = 0;
-		for(auto node : successNodes)
-		{
-			param *p = get_param(this, this->mq, node, NULL, 21);
-			pthread_create(&pid[i++], NULL, send_function, (void*)p);		
-		}
 		
-		while(--i >= 0)
+		for(int i = 0; i<workerCount; ++i)
 		{
-			pthread_join(pid[i], NULL);
+			if(operation[i] != NULL)
+			{
+				//cout << "\t[Coord] op row: "<< operation[i]->row << '\n';
+				param *p = get_param(this, this->mq, workerList[i], NULL, 11);
+				pthread_create(&pid[i], NULL, send_function, (void*)p);
+			}		
 		}
+
+		for(int i = workerCount-1; i>=0; --i)
+		{
+			if(operation[i] != NULL)
+				pthread_join(pid[i], NULL);
+		}	
 		
 		/* prepare phase failed */
 		return 0;
@@ -191,6 +197,7 @@ void Coordinator::send(IMessageQueue *mq, Node *to, void *msg, int action_code)
 
 void Coordinator::recv(IMessageQueue *mq, Node *from, void *msg, int reply_code)
 {
+	cout << "\t[Coord] Received "<< reply_code << " from " << from << '\n';
 	if(reply_code == 0)
 	{
 		sem_wait(&fNode_lock);

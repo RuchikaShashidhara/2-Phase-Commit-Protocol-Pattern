@@ -40,7 +40,9 @@ class Amazon
 		void printAllTransactions();
 		
 		int updateUserDetails();
-		int makePayment();			
+		int makePayment();	
+		
+		void testCase();		
 };
 
 #endif

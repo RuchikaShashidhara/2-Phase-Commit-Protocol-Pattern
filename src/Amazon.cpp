@@ -10,7 +10,7 @@ using namespace std;
 
 Amazon::Amazon(string branch_name) : branch_name(branch_name) 
 {
-	this->customer_db = new DBFile(10, 4, 1);
+	this->customer_db = new DBFile(10, 4);
     vector<string> customer_col_names = {
         "customer_id", 
         "name", 
@@ -19,7 +19,7 @@ Amazon::Amazon(string branch_name) : branch_name(branch_name)
     };
     this->customer_db_schema = new DBSchema(customer_db, customer_col_names);
     
-    this->payment_db = new DBFile(10, 5, 1);
+    this->payment_db = new DBFile(10, 5);
     vector<string> payment_col_names = {
         "payment_id", 
         "customer_id", 
@@ -29,7 +29,7 @@ Amazon::Amazon(string branch_name) : branch_name(branch_name)
     };
     this->payment_db_schema = new DBSchema(payment_db, payment_col_names);
 
-    this->shipping_db = new DBFile(10, 5, 0);
+    this->shipping_db = new DBFile(10, 5);
     vector<string> shipping_col_names = {
         "shipping_id", 
         "payment_id", 
@@ -101,6 +101,7 @@ int Amazon::registerUser()
     }
     
     else cout << "\nRegistration failed, please try again\n";
+    --userCount;
     return 0;
 }	
 
@@ -108,7 +109,7 @@ vector <string> Amazon::getUserDetails(string id)
 {	
     vector<string> record_values;
     pair<bool, int> success_row_num = customer_db_schema->getRowNumRecord(id);
-    if (success_row_num.first && dynamic_cast<DBFile*>(customer_db)->acquire_lock(4,0) == true)
+    if (success_row_num.first && dynamic_cast<DBFile*>(customer_db)->acquire_lock(2,0) == true)
     {
         record_values = customer_db->readRecord(success_row_num.second);
         dynamic_cast<DBFile*>(customer_db)->release_lock();     
@@ -136,26 +137,6 @@ vector <string> Amazon::getTransactionDetails(string id)
     }
     
     return record_values;
-}	
-
-void Amazon::printAllTransactions()
-{	
-	char id[20];
-		
-  	sprintf(id, "p%d", paymentCount); 
-  	string pid(id);;
-    vector<string> record_values;
-    pair<bool, int> success_row_num = shipping_db_schema->getRowNumRecord(id);
-    if (success_row_num.first && dynamic_cast<DBFile*>(shipping_db)->acquire_lock(2,0) == true)
-    {
-        record_values = payment_db->readRecord(success_row_num.second);
-        dynamic_cast<DBFile*>(payment_db)->release_lock();    
-    }
-    else
-    {
-        cout << "\nFailed to read record, invalid Transction ID";
-    }
-    
 }	
 
 int Amazon::updateUserDetails()
@@ -266,5 +247,173 @@ int Amazon::makePayment()
     }
     
     else cout << "\nUpdation failed, please try again\n";
+    --shippingCount;
+    --paymentCount;
     return 0;  	
 }	
+
+void Amazon::testCase()
+{  		
+
+	cout << "\n----------------------------------------------------------\n";
+	/* register new user */
+	cout << "Registering new user 1";
+	cout << "\n----------------------------------------------------------\n";
+	
+	vector <string> new_record1 = {"c1", "kavya", "8867845637", "india1"};
+    Log_t op1 = {1, 2, -1, -1, new_record1};
+    
+    vector <Log_t *> opList1 = {&op1, NULL, NULL};
+    int result1 = coord->performTransaction(opList1);
+    customer_db_schema->updateIdRowNum(op1.row, "c1", 0);
+    vector <string> user_details1 = getUserDetails("c1");
+	cout << '\n';
+	for (auto it : user_details1)
+		cout << it << " ";
+	cout << endl;    
+    
+	cout << "\n----------------------------------------------------------\n";
+	/* register new user */
+	cout << "Registering new user 2";
+	cout << "\n----------------------------------------------------------\n";
+	vector <string> new_record2 = {"c2", "ruchika", "456888", "india2"};
+    Log_t op2 = {1, 2, -1, -1, new_record2};
+    
+    vector <Log_t *> opList2 = {&op2, NULL, NULL};
+    int result2 = coord->performTransaction(opList2);
+    customer_db_schema->updateIdRowNum(op2.row, "c2", 0);
+    vector <string> user_details2 = getUserDetails("c2");
+	cout << '\n';
+	for (auto it : user_details2)
+		cout << it << " ";
+	cout << endl;
+	
+    
+	/* register new user */
+	#if 1
+	cout << "\n----------------------------------------------------------\n";
+	/* register new user */
+	cout << "Adding payment record - 1";
+	cout << "\n----------------------------------------------------------\n";
+	vector <string> new_record3 = {"p1", "ruchika", "456888", "india2"};
+    Log_t op3 = {1, 2, -1, -1, new_record3};
+    
+    vector <Log_t *> opList3 = {NULL, &op3, NULL};
+    int result3 = coord->performTransaction(opList3);
+    payment_db_schema->updateIdRowNum(op3.row, "p1", 0);
+    
+    vector <string> user_details3 = getTransactionDetails("p1");
+	cout << '\n';
+	for (auto it : user_details3)
+		cout << it << " ";
+	cout << endl;
+	#endif
+	
+	cout << "\n----------------------------------------------------------\n";
+    #if 1
+    /* update user, add payment record */
+    cout << "Test case: commit rollback (commit fails)";
+	cout << "\n----------------------------------------------------------\n";
+  	
+  	vector <string> paymentRecord = {"p2", "c2", "9800", "cash", "bangalore"}; 	  	
+    Log_t payment_op = {1, 2, -1, -1, paymentRecord}; 
+    
+	vector <string> update_record = {"c1", "balm", "", ""};		
+    pair<bool, pair<int, int>> success_row_num = customer_db_schema->getRowColNumsCell("c1", "name");
+    
+    if (success_row_num.first)
+    {
+    	cout << "ID found\n";
+    	Log_t op = {0, 0, success_row_num.second.first, success_row_num.second.second, update_record};
+    
+		vector <Log_t *> opList = {&op, &payment_op, NULL};
+		int result = coord->performTransaction(opList);
+		if(result == 1)
+    		payment_db_schema->updateIdRowNum(payment_op.row, "p2", 0);
+	}
+	#endif
+	cout << "\nCustomer DB: ";
+    vector <string> user_details = getUserDetails("c1");
+	cout << '\n';
+	for (auto it : user_details)
+		cout << it << " ";
+	
+    user_details = getUserDetails("c2");
+	cout << '\n';
+	for (auto it : user_details)
+		cout << it << " ";
+	
+    user_details = getUserDetails("c3");
+	cout << '\n';
+	for (auto it : user_details)
+		cout << it << " ";
+	cout << endl;
+	
+	cout << "\nPayment DB: \n";
+    vector <string> payment_details = getTransactionDetails("p1");
+	cout << '\n';
+	for (auto it : payment_details)
+		cout << it << " ";
+	
+    payment_details = getTransactionDetails("p2");
+	cout << '\n';
+	for (auto it : payment_details)
+		cout << it << " ";
+	
+    payment_details = getTransactionDetails("p3");
+	cout << '\n';
+	for (auto it : payment_details)
+		cout << it << " ";
+	
+	cout << "\n----------------------------------------------------------\n";
+    #if 1
+    /* update user, add payment record */
+    cout << "Test case: 2 phase works properly";
+	cout << "\n----------------------------------------------------------\n";
+  	
+  	vector <string> paymentRecord4 = {"p3", "c2", "9800", "cash", "bangalore"}; 	  	
+    Log_t payment_op4 = {1, 2, -1, -1, paymentRecord4}; 
+    
+	vector <string> new_record4 = {"c3", "balm34", "7685937", ""};
+    Log_t op4 = {1, 2, -1, -1, new_record4};	
+
+	vector <Log_t *> opList4 = {&op4, &payment_op4, NULL};
+	int result = coord->performTransaction(opList4);
+	if(result == 1)
+		payment_db_schema->updateIdRowNum(payment_op4.row, "p3", 0);
+		customer_db_schema->updateIdRowNum(op4.row, "c3", 0);
+	#endif
+	
+	cout << "\nCustomer DB: ";
+    user_details = getUserDetails("c1");
+	cout << '\n';
+	for (auto it : user_details)
+		cout << it << " ";
+	
+    user_details = getUserDetails("c2");
+	cout << '\n';
+	for (auto it : user_details)
+		cout << it << " ";
+	
+    user_details = getUserDetails("c3");
+	cout << '\n';
+	for (auto it : user_details)
+		cout << it << " ";
+	
+	cout << "\n\nPayment DB: ";
+    payment_details = getTransactionDetails("p1");
+	cout << '\n';
+	for (auto it : payment_details)
+		cout << it << " ";
+	
+    payment_details = getTransactionDetails("p2");
+	cout << '\n';
+	for (auto it : payment_details)
+		cout << it << " ";
+	
+    payment_details = getTransactionDetails("p3");
+	cout << '\n';
+	for (auto it : payment_details)
+		cout << it << " ";
+	cout << '\n';
+}

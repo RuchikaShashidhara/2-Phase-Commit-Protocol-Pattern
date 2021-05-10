@@ -1,8 +1,8 @@
-execute: client.o Amazon.o DBSchema.o File.o DBFile.o Mediator.o Worker.o Coordinator.o
-	g++ client.o Amazon.o DBSchema.o File.o DBFile.o Mediator.o Worker.o Coordinator.o -Wall -lpthread	
+execute: client_2.o Amazon.o DBSchema.o File.o DBFile.o Mediator.o Worker.o Coordinator.o
+	g++ client_2.o Amazon.o DBSchema.o File.o DBFile.o Mediator.o Worker.o Coordinator.o -Wall -lpthread	
 	
-client.o: client.cpp
-	g++ -c -std=c++2a client.cpp
+client_2.o: client_2.cpp
+	g++ -c -std=c++2a client_2.cpp
 
 Amazon.o: src/Amazon.cpp
 	g++ -c -std=c++2a src/Amazon.cpp
