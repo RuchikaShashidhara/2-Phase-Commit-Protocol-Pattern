@@ -37,6 +37,7 @@ class Amazon
 		int registerUser();
 		vector <string> getUserDetails(string id);
 		vector <string> getTransactionDetails(string id);
+		void printAllTransactions();
 		
 		int updateUserDetails();
 		int makePayment();			

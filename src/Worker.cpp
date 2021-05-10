@@ -11,8 +11,8 @@ Worker::Worker(File *fp) : fp(dynamic_cast<DBFile*>(fp)) {}
 int Worker::prepare()
 {
 	if(fp->acquire_lock(4, 0) == true)
-		return 0;
-	return 1;
+		return 1;
+	return 0;
 }
 
 int Worker::releaseLock()
@@ -29,14 +29,16 @@ int Worker::commit(void *op)
 	if(oldLog == NULL)
 		return 0;
 		
-	logs.push_back(oldLog);
+	logs.push_back(oldLog);	
+	cout << "[Worker "<< this <<"] Update worked\n";
 	return 1;
 }
 
 int Worker::commitRollback()
 {
-	Log_t *oldOperation = *(logs.rbegin()+1);
+	Log_t *oldOperation = logs.back();
 	logs.pop_back();
+	cout << "[Worker "<< this <<"] Write rollback\n";
 	fp->write(oldOperation);
 	
 	fp->release_lock();

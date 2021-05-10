@@ -10,7 +10,7 @@ using namespace std;
 
 Amazon::Amazon(string branch_name) : branch_name(branch_name) 
 {
-	this->customer_db = new DBFile(10, 4);
+	this->customer_db = new DBFile(10, 4, 1);
     vector<string> customer_col_names = {
         "customer_id", 
         "name", 
@@ -19,7 +19,7 @@ Amazon::Amazon(string branch_name) : branch_name(branch_name)
     };
     this->customer_db_schema = new DBSchema(customer_db, customer_col_names);
     
-    this->payment_db = new DBFile(10, 5);
+    this->payment_db = new DBFile(10, 5, 1);
     vector<string> payment_col_names = {
         "payment_id", 
         "customer_id", 
@@ -29,7 +29,7 @@ Amazon::Amazon(string branch_name) : branch_name(branch_name)
     };
     this->payment_db_schema = new DBSchema(payment_db, payment_col_names);
 
-    this->shipping_db = new DBFile(10, 5);
+    this->shipping_db = new DBFile(10, 5, 0);
     vector<string> shipping_col_names = {
         "shipping_id", 
         "payment_id", 
@@ -136,6 +136,26 @@ vector <string> Amazon::getTransactionDetails(string id)
     }
     
     return record_values;
+}	
+
+void Amazon::printAllTransactions()
+{	
+	char id[20];
+		
+  	sprintf(id, "p%d", paymentCount); 
+  	string pid(id);;
+    vector<string> record_values;
+    pair<bool, int> success_row_num = shipping_db_schema->getRowNumRecord(id);
+    if (success_row_num.first && dynamic_cast<DBFile*>(shipping_db)->acquire_lock(2,0) == true)
+    {
+        record_values = payment_db->readRecord(success_row_num.second);
+        dynamic_cast<DBFile*>(payment_db)->release_lock();    
+    }
+    else
+    {
+        cout << "\nFailed to read record, invalid Transction ID";
+    }
+    
 }	
 
 int Amazon::updateUserDetails()

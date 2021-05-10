@@ -65,6 +65,11 @@ int main()
 				break;
 			}
 			
+			case 6:
+			{
+				break;
+			}
+			
 			case 0:
 			{
 				cout << "\nExiting...\n\n";

@@ -32,8 +32,6 @@ param *get_param(Node *from, IMessageQueue *mq, Node *to, void *msg, int action_
 	tmp->msg = msg,
 	tmp->action_code = action_code;
 	
-	cout << "[Coord] Param = " << tmp << '\n';
-	
 	return tmp;
 }
 

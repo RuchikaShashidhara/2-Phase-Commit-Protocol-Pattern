@@ -13,7 +13,7 @@ class DBFile : public File
         sem_t __semaphore_lock;
 
     public:
-        DBFile(int num_of_row, int num_of_col);
+        DBFile(int num_of_row, int num_of_col, int sem_value);
         ~DBFile();
         bool acquire_lock(long sec, long nsec);
         void release_lock();
