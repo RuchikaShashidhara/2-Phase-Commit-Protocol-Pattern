@@ -14,12 +14,13 @@ class Worker : public Node
 		DBFile *fp;
 		vector <Log_t *> logs;
 		
-	public:
-		Worker(File *fp);
 		int prepare();
 		int releaseLock();
 		int commit(void* operation);
 		int commitRollback();	
+		
+	public:
+		Worker(File *fp);
 		
 		virtual void send(IMessageQueue *mq, Node *to, void *msg, int reply_code);
 		virtual void recv(IMessageQueue *mq, Node *from, void *msg, int action_code);

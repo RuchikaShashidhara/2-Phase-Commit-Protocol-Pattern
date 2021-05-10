@@ -26,8 +26,6 @@ int Worker::commit(void *op)
 	Log_t *operation = (Log_t *)op;
 	Log_t *oldLog = fp->write(operation);
 	
-	cout << "\t[Worker] op row: "<< operation->row << '\n';
-	
 	if(oldLog == NULL)
 		return 0;
 		
@@ -52,7 +50,7 @@ void Worker::send(IMessageQueue *mq, Node *to, void *msg, int reply_code)
 
 void Worker::recv(IMessageQueue *mq, Node *from, void *msg, int action_code)
 {
-	cout << "[Worker "<< this <<"] Received action from "<< from << ": " << action_code << '\n';
+	cout << "[Worker "<< this <<"] Received action code " << action_code << " from " << from << '\n';
 	int response;
 	if(action_code == 10)
 		response = this->prepare();

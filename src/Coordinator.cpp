@@ -22,15 +22,30 @@ typedef struct param
 	
 } param;
 
+param *get_param(Node *from, IMessageQueue *mq, Node *to, void *msg, int action_code)
+{
+	param *tmp = new param;
+	
+	tmp->from = from;
+	tmp->mq = mq;
+	tmp->to = to;
+	tmp->msg = msg,
+	tmp->action_code = action_code;
+	
+	cout << "[Coord] Param = " << tmp << '\n';
+	
+	return tmp;
+}
+
 void *send_function(void *arg)
 {
 	pthread_detach(pthread_self());
 	
 	param *p = (param *)arg;
-	cout << "[Coor] 2. Sending action code " << p->action_code <<  "[Coor] From: "<< p->from << " To: " << p->to << '\n';
+	//cout << "[Coor] 2. Sending action code " << p->action_code <<  "[Coor] From: "<< p->from << " To: " << p->to << '\n';
 	(p->from)->send(p->mq, p->to, p->msg, p->action_code);
-	if(p->msg)
-		cout << "[Coord] 3. Row number: " << ((Log_t *)p->msg)->row << '\n';
+	//if(p->msg)
+		//cout << "[Coord] 3. Row number: " << ((Log_t *)p->msg)->row << '\n';
 	
 	pthread_exit(NULL);	
 }
@@ -40,37 +55,45 @@ Coordinator::Coordinator(int workerCount, vector <Node*> workers, IMessageQueue 
 	this->workerCount = workerCount;
 	this->mq = mq;
 	
-	cout << "Coordinator: " << this << "\nWorkers: ";
+	cout << "\n\nCoordinator: " << this << "\nWorkers: ";
 	for(auto node : workers)
 	{
 		workerList.push_back(node);
 		cout << node << ' ';
 	}
-	cout << '\n';
+	cout << "\n";
 	
 	sem_init(&sNode_lock, 1, 1);
 	sem_init(&fNode_lock, 1, 1);
 }
+
+Coordinator::~Coordinator()
+{
+	for(auto node : workerList)
+		free(node);
+	
+	free(mq);
+}
 	
 int Coordinator::performTransaction(vector <Log_t*> operation)
 {
-	cout << "[Coor] Starting transaction\n";
+	//cout << "[Coor] Starting transaction\n";
 	pthread_t pid[workerCount];
 	
 	/* prepare phase */	
 	successNodes.clear();
 	failedNodes.clear();
 	
-	param p[workerCount];
+	param *p[workerCount];
 	
 	for(int i = 0; i<workerCount; ++i)
 	{
 		if(operation[i] != NULL)
 		{
-			p[i] = {this, this->mq, workerList[i], NULL, 10};
-			cout << "[Coor] 1. Sending action code " << p[i].action_code << " to " << workerList[i] << '\n';
-			pthread_create(&pid[i], NULL, send_function, (void*)&p[i]);
-			cout << "[Coord] Created a thread\n";
+			p[i] = get_param(this, this->mq, workerList[i], NULL, 10);
+			cout << "[Coor] 1. Sending action code " << p[i]->action_code << " to " << workerList[i] << '\n';
+			pthread_create(&pid[i], NULL, send_function, (void*)p[i]);
+			//cout << "[Coord] Created a thread\n";
 		}		
 	}
 	
@@ -86,8 +109,8 @@ int Coordinator::performTransaction(vector <Log_t*> operation)
 		int i = 0;
 		for(auto node : successNodes)
 		{
-			param p = {this, this->mq, node, NULL, 11};
-			pthread_create(&pid[i++], NULL, send_function, (void*)&p);		
+			param *p = get_param(this, this->mq, node, NULL, 11);
+			pthread_create(&pid[i++], NULL, send_function, (void*)p);		
 		}
 		
 		while(--i >= 0)
@@ -107,8 +130,8 @@ int Coordinator::performTransaction(vector <Log_t*> operation)
 	{
 		if(operation[i] != NULL)
 		{
-			param p = {this, this->mq, workerList[i], (void *)operation[i], 20};
-			pthread_create(&pid[i], NULL, send_function, (void*)&p);	
+			param *p = get_param(this, this->mq, workerList[i], (void *)operation[i], 20);
+			pthread_create(&pid[i], NULL, send_function, (void*)p);	
 			sleep(1);
 		}	
 	}
@@ -125,8 +148,8 @@ int Coordinator::performTransaction(vector <Log_t*> operation)
 		int i = 0;
 		for(auto node : successNodes)
 		{
-			param p = {this, this->mq, node, NULL, 21};
-			pthread_create(&pid[i++], NULL, send_function, (void*)&p);		
+			param *p = get_param(this, this->mq, node, NULL, 21);
+			pthread_create(&pid[i++], NULL, send_function, (void*)p);		
 		}
 		
 		while(--i >= 0)
@@ -138,14 +161,19 @@ int Coordinator::performTransaction(vector <Log_t*> operation)
 		return 0;
 	}
 	
+	cout << "[Coord] Success nodes = ";
+	for(auto it: successNodes)
+		cout << it << ' ';
+	cout << "\n\n";
+	
 	/* transaction complete, release all locks */
 	for(int i = 0; i<workerCount; ++i)
 	{
 		if(operation[i] != NULL)
 		{
-			cout << "\t[Coord] op row: "<< operation[i]->row << '\n';
-			param p = {this, this->mq, workerList[i], NULL, 11};
-			pthread_create(&pid[i], NULL, send_function, (void*)&p);
+			//cout << "\t[Coord] op row: "<< operation[i]->row << '\n';
+			param *p = get_param(this, this->mq, workerList[i], NULL, 11);
+			pthread_create(&pid[i], NULL, send_function, (void*)p);
 		}		
 	}
 	
@@ -160,7 +188,7 @@ int Coordinator::performTransaction(vector <Log_t*> operation)
 
 void Coordinator::send(IMessageQueue *mq, Node *to, void *msg, int action_code)
 {	
-	cout << "[Coor "<<this<<"] 3. Sending action code " << action_code << '\n';
+	//cout << "[Coor "<<this<<"] 3. Sending action code " << action_code << '\n';
 	mq->send(this, to, msg, action_code);
 }
 

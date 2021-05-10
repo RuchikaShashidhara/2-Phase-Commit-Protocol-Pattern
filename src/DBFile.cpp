@@ -17,33 +17,27 @@ DBFile :: ~DBFile()
 
 bool DBFile :: acquire_lock(long sec, long nsec)
 {
-	#if 1
     struct timespec ts;
     if (clock_gettime(CLOCK_REALTIME, &ts) == -1)   // if error is thrown, no lock is acquired & semaphore is unchanged.
     {
-    	cout << "[DBFile] locking deadlock\n";
         return false;
     } 
     ts.tv_sec += sec;
     ts.tv_nsec += nsec;
 
     int check_aquired = sem_timedwait(&__semaphore_lock, &ts);
-    #endif
-    //int check_aquired = sem_trywait(&__semaphore_lock);
     if (check_aquired == 0)  //0 : The calling process successfully performed the semaphore lock operation
     {
         return true;
     }
     else    //-1 : The call was unsuccessful (errno is set). The state of the semaphore is unchanged. 
     {
-    	cout << "[DBFile] couldn't acquire lock\n";
         return false;
     }
 }
 
 void DBFile :: release_lock()
 {
-    cout << "[DBFile] releasing lock\n";
     sem_post(&__semaphore_lock);
 }
 
@@ -88,7 +82,7 @@ Log_t* DBFile :: write(Log_t *operation)
     {
         log_write_prev_value->row = addRecord(operation->value);
         operation->row = log_write_prev_value->row;
-        cout << "\t[DBFile] Updated row value: " << operation->row << '\n';
+        //cout << "\t[DBFile] Updated row value: " << operation->row << '\n';
     }
 
     return log_write_prev_value;

@@ -26,7 +26,7 @@ MessageQueue::MessageQueue(const string& name) : name(name) {}
 
 void MessageQueue::send(Node *from, Node *to, void *msg, int action_code)
 {
-	cout << "[MQ] Sending msg to worker " << action_code << '\n';
+	//cout << "[MQ] Sending msg to worker " << action_code << '\n';
 	to->recv(this, from, msg, action_code);
 }
 

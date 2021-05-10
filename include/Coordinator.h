@@ -24,6 +24,7 @@ class Coordinator : public Node
 		
 	public:
 		Coordinator(int workerCount, vector <Node*> workers, IMessageQueue *mq);
+		~Coordinator();
 		int performTransaction(vector <Log_t*> operation);		
 		
 		virtual void send(IMessageQueue *mq, Node *to, void *msg, int action_code);

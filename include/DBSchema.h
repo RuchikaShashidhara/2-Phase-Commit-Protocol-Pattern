@@ -22,11 +22,11 @@ class DBSchema
         DBSchema(File* file_values_obj_ptr, vector<string>& schema);
         ~DBSchema();                
         pair<bool, int> getRowNumRecord(string id);
-            // used before calling - delete record(1), read record(2), update record(3)
+            // used before calling -  read record(2), update record(3)
         pair<bool, pair<int, int>> getRowColNumsCell(string id, string schema_col_name);
             // used before calling - read cell(20), update cell(30)
         void updateIdRowNum(int row_num, string id, int op_code);   
-            // used after calling - add record(0),delete record(1)           
+            // used after calling - add record(0)           
 };
 
 #endif

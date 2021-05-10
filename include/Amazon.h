@@ -33,6 +33,7 @@ class Amazon
 	
 	public:
 		Amazon(string branch_name);
+		~Amazon();
 		int registerUser();
 		vector <string> getUserDetails(string id);
 		vector <string> getTransactionDetails(string id);

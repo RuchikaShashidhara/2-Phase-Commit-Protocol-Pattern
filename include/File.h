@@ -17,7 +17,7 @@ class File
 
     public:
         File(int num_of_row, int num_of_col);
-        virtual ~File();
+        virtual ~File() {};
         virtual int getTotalRowNum();
         virtual int getTotalColNum();
         virtual int addRecord(vector<string> record_values);                

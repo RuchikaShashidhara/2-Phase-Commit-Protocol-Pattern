@@ -50,10 +50,10 @@ int DBSchema :: __getColNum(string schema_col_name)
 
 pair<bool, int> DBSchema :: getRowNumRecord(string id)
 {
-	cout << "[DB Schema] Row ID : " << id << "\n";
+	//cout << "[DB Schema] Row ID : " << id << "\n";
     pair<bool, int> result_success_row_num;
     int row_num = __getRowNum(id);
-	cout << "[DB Schema] Row number of the given ID : " << row_num << ">\n";
+	//cout << "[DB Schema] Row number of the given ID : " << row_num << ">\n";
     
     if (row_num == -1)      // invalid
     {
@@ -98,9 +98,9 @@ void DBSchema :: updateIdRowNum(int row_num, string id, int op_code)
             __id_row_num[id] = row_num;
             for(auto it : __id_row_num)
             {
-            	cout << "[DB Schema] Key = " << it.first << "Value = " << it.second << '\n';
+            	//cout << "[DB Schema] Key = " << it.first << "Value = " << it.second << '\n';
             }
-			cout << "[DB Schema] Row ID is updated \n";
+			//cout << "[DB Schema] Row ID is updated \n";
         }
         else if (op_code == 1)          // deleteRecord
         {

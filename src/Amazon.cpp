@@ -6,7 +6,6 @@ using namespace std;
 
 #include "../include/Amazon.h"
 #include "../include/Mediator.h"
-#include "../include/Coordinator.h"
 #include "../include/Worker.h"
 
 Amazon::Amazon(string branch_name) : branch_name(branch_name) 
@@ -56,6 +55,20 @@ Amazon::Amazon(string branch_name) : branch_name(branch_name)
     shippingCount = 0;
 }
 
+Amazon::~Amazon() 
+{
+	free(customer_db);
+	free(customer_db_schema);
+		
+	free(payment_db);
+	free(payment_db_schema);
+	
+	free(shipping_db);
+	free(shipping_db_schema);
+	
+	free(coord);
+}
+
 int Amazon::registerUser()
 {
 	char id[20];
@@ -81,13 +94,13 @@ int Amazon::registerUser()
     
     if(result == 1)
     {
-    	cout << "User successfuly registered, user ID: " << id << "\n";  	
+    	cout << "\nUser successfuly registered, user ID: " << id << "\n";  	
     	customer_db_schema->updateIdRowNum(op.row, uid, 0);
     	
     	return 1;  	
     }
     
-    else cout << "Registration failed, please try again\n";
+    else cout << "\nRegistration failed, please try again\n";
     return 0;
 }	
 
@@ -95,15 +108,14 @@ vector <string> Amazon::getUserDetails(string id)
 {	
     vector<string> record_values;
     pair<bool, int> success_row_num = customer_db_schema->getRowNumRecord(id);
-    if (success_row_num.first)
+    if (success_row_num.first && dynamic_cast<DBFile*>(customer_db)->acquire_lock(4,0) == true)
     {
-    	cout << "[Amazon] Customer DB: " << customer_db << '\n';
         record_values = customer_db->readRecord(success_row_num.second);
-    	cout << "[Amazon] readRecord() works\n";              
+        dynamic_cast<DBFile*>(customer_db)->release_lock();     
     }
     else
     {
-        cout << "Failed to read record\n";
+        cout << "\nFailed to read record, invalid customer ID\n";
     }
     
     return record_values;
@@ -113,13 +125,14 @@ vector <string> Amazon::getTransactionDetails(string id)
 {
     vector<string> record_values;
     pair<bool, int> success_row_num = payment_db_schema->getRowNumRecord(id);
-    if (success_row_num.first)
+    if (success_row_num.first && dynamic_cast<DBFile*>(payment_db)->acquire_lock(2,0) == true)
     {
         record_values = payment_db->readRecord(success_row_num.second);
+        dynamic_cast<DBFile*>(payment_db)->release_lock();    
     }
     else
     {
-        cout << "Failed to read record\n";
+        cout << "\nFailed to read record, invalid Transction ID";
     }
     
     return record_values;
@@ -130,7 +143,7 @@ int Amazon::updateUserDetails()
 	string uid, schema_col_name;
 	int col_name;
 	
-	cout << "Enter user ID: ";
+	cout << "\nEnter user ID: ";
 	cin >> uid;	
 	
 	cout << "Select the field whose value has to be changed: \n";
@@ -168,19 +181,19 @@ int Amazon::updateUserDetails()
         
         if(result == 1)
         {
-        	cout << "Details successfuly updated\n";
+        	cout << "\nDetails successfuly updated\n";
         	return 1;
         }
         else
         {
-        	cout << "Updation failed, please try again\n";
+        	cout << "\nUpdation failed, please try again\n";
         	return 0;
         }
     }
     
     else
     {
-        cout << "Invalid user ID\n";
+        cout << "\nInvalid user ID\n";
         return 0;
     }
 }	
@@ -199,7 +212,7 @@ int Amazon::makePayment()
   	
   	string uid, amount, mode, location, delivered, timestamp;
   	
-  	cout << "Enter customer ID: ";
+  	cout << "\nEnter customer ID: ";
   	cin >> uid;
   	
   	cout << "Enter payment amount: ";
@@ -224,14 +237,14 @@ int Amazon::makePayment()
     int result = coord->performTransaction(opList);
     if(result == 1)
     {
-    	cout << "Details successfuly updated, transaction ID = " << pid << "\n";  
-    	cout << "[Amazon] Shipping row no: " << shipping_op.row << "  Payment row no: " << payment_op.row << '\n';
+    	cout << "\nDetails successfuly updated, transaction ID = " << pid << "\n";  
+    	//cout << "[Amazon] Shipping row no: " << shipping_op.row << "  Payment row no: " << payment_op.row << '\n';
     	shipping_db_schema->updateIdRowNum(shipping_op.row, sid, 0);
     	payment_db_schema->updateIdRowNum(payment_op.row, pid, 0);
     	
     	return 1;
     }
     
-    else cout << "Updation failed, please try again\n";
+    else cout << "\nUpdation failed, please try again\n";
     return 0;  	
 }	
