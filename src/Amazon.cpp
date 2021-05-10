@@ -115,7 +115,7 @@ vector <string> Amazon::getUserDetails(string id)
     }
     else
     {
-        cout << "\nFailed to read record, invalid customer ID\n";
+        cout << "\nFailed to read record, invalid customer ID";
     }
     
     return record_values;
@@ -147,7 +147,7 @@ int Amazon::updateUserDetails()
 	cin >> uid;	
 	
 	cout << "Select the field whose value has to be changed: \n";
-	cout << "1. Name\t2. Phone no\t3. Address\n";
+	cout << "1. Name  2. Phone no  3. Address\n";
 	bool valid;
 	do
 	{
@@ -186,14 +186,14 @@ int Amazon::updateUserDetails()
         }
         else
         {
-        	cout << "\nUpdation failed, please try again\n";
+        	cout << "\nUpdation failed, please try again";
         	return 0;
         }
     }
     
     else
     {
-        cout << "\nInvalid user ID\n";
+        cout << "\nInvalid user ID";
         return 0;
     }
 }	

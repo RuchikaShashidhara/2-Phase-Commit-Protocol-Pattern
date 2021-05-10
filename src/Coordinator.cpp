@@ -188,7 +188,6 @@ int Coordinator::performTransaction(vector <Log_t*> operation)
 
 void Coordinator::send(IMessageQueue *mq, Node *to, void *msg, int action_code)
 {	
-	//cout << "[Coor "<<this<<"] 3. Sending action code " << action_code << '\n';
 	mq->send(this, to, msg, action_code);
 }
 

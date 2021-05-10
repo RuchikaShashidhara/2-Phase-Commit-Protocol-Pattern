@@ -15,6 +15,7 @@ struct Log
 		//1 = true
 		//0 = false => write(update) operation
 		//2 => add new record operation
+		//3 => delete record
 	int row;
 	int col;
 	vector <string> value;

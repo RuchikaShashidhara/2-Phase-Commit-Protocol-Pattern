@@ -5,9 +5,9 @@ using namespace std;
 
 #include "../include/DBFile.h"
 
-DBFile :: DBFile(int num_of_row, int num_of_col) : File(num_of_col, num_of_row)
+DBFile :: DBFile(int num_of_row, int num_of_col) : File(num_of_col, num_of_row, int sem_value)
 {    
-    sem_init(&__semaphore_lock, 1, 1);    
+    sem_init(&__semaphore_lock, 1, sem_value);    
 }
 
 DBFile :: ~DBFile()

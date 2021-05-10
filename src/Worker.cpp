@@ -11,8 +11,8 @@ Worker::Worker(File *fp) : fp(dynamic_cast<DBFile*>(fp)) {}
 int Worker::prepare()
 {
 	if(fp->acquire_lock(4, 0) == true)
-		return 1;
-	return 0;
+		return 0;
+	return 1;
 }
 
 int Worker::releaseLock()
