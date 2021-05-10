@@ -14,19 +14,23 @@ class DBSchema
 {
     private:
         map<string, int> __id_row_num;
+            // Stores ID of record as key & Row Number as value  
         vector<string> __db_schema;
+            // Stores Column Names of the DB Table File
         int __getRowNum(string id);
+            // Used to retieve Row Number
         int __getColNum(string schema_col_name);
+            // Used to retrieve Column Number
 
     public:
         DBSchema(File* file_values_obj_ptr, vector<string>& schema);
         ~DBSchema();                
         pair<bool, int> getRowNumRecord(string id);
-            // used before calling -  read record(2), update record(3)
+            // Used before calling - read, update, delete record operations
         pair<bool, pair<int, int>> getRowColNumsCell(string id, string schema_col_name);
-            // used before calling - read cell(20), update cell(30)
+            // Used before calling - read & update cell operations
         void updateIdRowNum(int row_num, string id, int op_code);   
-            // used after calling - add record(0)           
+            // Used after calling - add record(0)           
 };
 
 #endif

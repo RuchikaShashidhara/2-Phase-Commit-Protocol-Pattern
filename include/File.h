@@ -6,14 +6,15 @@
 
 using namespace std;
 
-/*
-*/
 class File 
 {
     private:
-        vector<vector<string>> __file_values;
+        vector<vector<string>> __file_values;   
+            // 2D String Array to store the file's data
         int __file_total_num_of_row;
-        int __file_total_num_of_col;           
+            // Total number of initialized rows for file data
+        int __file_total_num_of_col;          
+            // Total number of initialized columns for file data
 
     public:
         File(int num_of_row, int num_of_col);

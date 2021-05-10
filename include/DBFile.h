@@ -17,8 +17,10 @@ class DBFile : public File
         ~DBFile();
         bool acquire_lock(long sec, long nsec);
         void release_lock();
-        Log_t* read(Log_t *operation);
-        Log_t* write(Log_t *operation);
+        Log_t* read(Log_t *operation);  
+            // used to perform read operations
+        Log_t* write(Log_t *operation); 
+            // used to perform write(update, delete & add new record) operations
 };
 
 #endif
