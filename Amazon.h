@@ -4,12 +4,12 @@
 #include <vector>
 #include <string>
 
-#include "DBSchema.h"
-#include "File.h"
-#include "DBFile.h"
-#include "Coordinator.h"
-
 using namespace std;
+
+#include "include/DBSchema.h"
+#include "include/File.h"
+#include "include/DBFile.h"
+#include "include/Coordinator.h"
 
 class Amazon
 {

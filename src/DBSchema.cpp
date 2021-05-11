@@ -1,10 +1,10 @@
 #include <iostream>
 #include <algorithm>
 
+using namespace std;
+
 #include "../include/File.h"
 #include "../include/DBSchema.h"
-
-using namespace std;
 
 DBSchema :: DBSchema(File* file_values_obj_ptr, vector<string>& schema) 
 {

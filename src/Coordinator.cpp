@@ -2,14 +2,11 @@
 #include <vector>
 #include <semaphore.h>
 #include <pthread.h>
-
 #include <unistd.h>
-
 
 using namespace std;
 
 #include "../include/Coordinator.h"
-
 
 typedef struct param
 {

@@ -4,7 +4,7 @@
 
 using namespace std;
 
-#include "include/Amazon.h"
+#include "Amazon.h"
 
 int main()
 {

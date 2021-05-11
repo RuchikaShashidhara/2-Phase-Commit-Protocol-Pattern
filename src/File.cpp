@@ -1,8 +1,8 @@
 #include <iostream>
 
-#include "../include/File.h"
-
 using namespace std;
+
+#include "../include/File.h"
 
 File :: File(int num_of_row, int num_of_col)
 {

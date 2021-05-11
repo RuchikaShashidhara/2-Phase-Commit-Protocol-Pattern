@@ -4,9 +4,9 @@
 
 using namespace std;
 
-#include "../include/Amazon.h"
-#include "../include/Mediator.h"
-#include "../include/Worker.h"
+#include "Amazon.h"
+#include "include/Mediator.h"
+#include "include/Worker.h"
 
 Amazon::Amazon(string branch_name) : branch_name(branch_name) 
 {
