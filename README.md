@@ -1,3 +1,5 @@
+</br>
+
 # 2-Phase-Commit-Protocol-Pattern
 
 Two-phase commit protocol (2PC) is a type of atomic commitment protocol (ACP). It coordinates all the processes that participate in a distributed atomic transaction on whether to commit or abort (rollback) the transaction. It is a specialized type of consensus protocol and it is implemented in two phases - <i>Prepare</i> & <i>Commit</i> achieved through 2 types of server nodes - <i>Coordinator</i> & <i>Participants</i>. This protocol also follows the ACID (Atomicity, Consistency, Isolation & Durability) rules which is used in distributed transactions.
@@ -53,7 +55,7 @@ make clean
 
 </br>
 
-## <b> Two Phase Commit Protocol </b>
+## <b> Two-Phase Commit Protocol </b>
 
 Two-Phase Commit Protocol consists of 2 types of Server Nodes:
 * <i>Coordinator</i>: Single Leader Node that decides whether to Commit or Rollback Transactions
