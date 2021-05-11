@@ -14,7 +14,6 @@ class DBFile : public File
 
     public:
         DBFile(int num_of_row, int num_of_col);
-        ~DBFile();
         bool acquire_lock(long sec, long nsec);
         void release_lock();
         Log_t* read(Log_t *operation);  

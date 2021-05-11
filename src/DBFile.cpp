@@ -11,11 +11,6 @@ DBFile :: DBFile(int num_of_row, int num_of_col) : File(num_of_col, num_of_row)
     sem_init(&__semaphore_lock, 1, 1);  
 }
 
-DBFile :: ~DBFile()
-{
-    
-}
-
 bool DBFile :: acquire_lock(long sec, long nsec)
 {
     struct timespec ts;

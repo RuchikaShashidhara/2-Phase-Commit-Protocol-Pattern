@@ -23,8 +23,7 @@ class DBSchema
             // Used to retrieve Column Number
 
     public:
-        DBSchema(File* file_values_obj_ptr, vector<string>& schema);
-        ~DBSchema();                
+        DBSchema(File* file_values_obj_ptr, vector<string>& schema);             
         pair<bool, int> getRowNumRecord(string id);
             // Used before calling - read, update, delete record operations
         pair<bool, pair<int, int>> getRowColNumsCell(string id, string schema_col_name);

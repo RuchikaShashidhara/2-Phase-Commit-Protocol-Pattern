@@ -12,11 +12,6 @@ DBSchema :: DBSchema(File* file_values_obj_ptr, vector<string>& schema)
     __db_schema.assign(schema.begin(), schema.end());
 }
 
-DBSchema :: ~DBSchema() 
-{
-
-}
-
 int DBSchema :: __getRowNum(string id)
 {
     int row_num;
